@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>СКУЛДРОП</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#030305;--s1:#07070e;--s2:#0b0b16;--card:#0e0e1a;--card2:#12121f;
+  --border:#181828;--border2:#222238;
+  --green:#00ff88;--cyan:#00e5ff;--orange:#ff6b00;
+  --red:#ff2244;--yellow:#ffd700;--purple:#a855f7;
+  --text:#b8c0d8;--text2:#505870;
+  --mono:'Share Tech Mono',monospace;--hud:'Orbitron',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--mono);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(0,255,136,.015) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(0,255,136,.015) 1px,transparent 1px);
+  background-size:44px 44px;pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);
+  pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;
+  background:rgba(3,3,5,.94);border-bottom:1px solid var(--border);
+  backdrop-filter:blur(20px);position:sticky;top:0;z-index:300}
+.logo{font-family:var(--hud);font-size:16px;font-weight:900;letter-spacing:4px;color:var(--green);text-shadow:0 0 20px rgba(0,255,136,.5)}
+.logo sub{font-size:8px;color:var(--text2);font-weight:400;letter-spacing:1px;margin-left:3px}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.hdr-bal{display:flex;align-items:center;gap:5px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);padding:5px 10px;border-radius:4px;font-size:11px;color:var(--green);font-family:var(--hud);cursor:pointer;transition:all .2s}
+.hdr-bal:hover{background:rgba(0,255,136,.14)}
+.dot{width:6px;height:6px;border-radius:50%;animation:blink 1.5s infinite;flex-shrink:0}
+.dot-g{background:var(--green)}.dot-p{background:var(--purple)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.nick-btn{display:flex;align-items:center;gap:5px;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.3);padding:5px 10px;border-radius:4px;font-size:10px;color:var(--purple);cursor:pointer;font-family:var(--mono);transition:all .2s}
+.nick-btn:hover{background:rgba(168,85,247,.2)}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:rgba(3,3,5,.97);border-top:1px solid var(--border);backdrop-filter:blur(20px);z-index:300;padding-bottom:env(safe-area-inset-bottom)}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:9px 0;cursor:pointer;font-size:10px;color:var(--text2);border:none;background:none;font-family:var(--mono);transition:color .2s;position:relative}
+.nb.active{color:var(--green)}
+.nb.active::after{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:var(--green);border-radius:0 0 3px 3px;box-shadow:0 0 10px var(--green)}
+.nb-icon{font-size:18px;line-height:1}
+.nb-plus{flex:none;width:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;font-family:var(--mono)}
+.plus-ring{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:20px;color:#000;font-weight:900;box-shadow:0 0 20px rgba(0,255,136,.4);transition:all .2s;margin-top:-12px}
+.nb-plus:hover .plus-ring{transform:scale(1.1);box-shadow:0 0 32px rgba(0,255,136,.6)}
+.nb-plus span{font-size:10px;color:var(--text2)}
+.screen{display:none;padding:14px 14px 78px;animation:fadeUp .2s ease}
+.screen.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#screen-setup{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.setup-box{width:100%;max-width:420px;background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:28px 22px;animation:fadeUp .3s ease}
+.setup-logo{font-family:var(--hud);font-size:24px;font-weight:900;color:var(--green);text-align:center;letter-spacing:4px;text-shadow:0 0 24px rgba(0,255,136,.5);margin-bottom:4px}
+.setup-tagline{text-align:center;font-size:10px;color:var(--text2);letter-spacing:2px;margin-bottom:20px}
+.auth-tabs{display:flex;gap:8px;margin-bottom:20px}
+.auth-tab{flex:1;padding:9px;border-radius:6px;cursor:pointer;font-size:11px;font-family:var(--mono);border:1px solid var(--border2);color:var(--text2);background:var(--s1);transition:all .2s;text-align:center;font-weight:700}
+.auth-tab.on{border-color:var(--green);color:#000;background:var(--green)}
+.school-wrap{position:relative;margin-bottom:4px}
+.school-drop{position:absolute;top:100%;left:0;right:0;background:var(--card2);border:1px solid var(--border2);border-top:none;border-radius:0 0 6px 6px;z-index:200;max-height:200px;overflow-y:auto;display:none}
+.school-drop.open{display:block}
+.school-opt{padding:9px 12px;font-size:12px;cursor:pointer;color:var(--text);border-bottom:1px solid var(--border);transition:background .15s}
+.school-opt:hover{background:rgba(0,255,136,.08);color:var(--green)}
+.school-opt.new-s{color:var(--cyan);font-style:italic}
+.school-opt:last-child{border-bottom:none}
+.order-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:13px;margin-bottom:10px;cursor:pointer;transition:border-color .2s,transform .15s;position:relative;overflow:hidden}
+.order-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.order-card.cat-hw::before{background:var(--cyan)}
+.order-card.cat-food::before{background:var(--orange)}
+.order-card.cat-notes::before{background:var(--purple)}
+.order-card.cat-task::before{background:var(--yellow)}
+.order-card:hover{border-color:var(--border2);transform:translateY(-1px)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:7px}
+.cat-tag{font-size:10px;padding:2px 8px;border-radius:3px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+.cat-hw .cat-tag{background:rgba(0,229,255,.1);color:var(--cyan)}
+.cat-food .cat-tag{background:rgba(255,107,0,.1);color:var(--orange)}
+.cat-notes .cat-tag{background:rgba(168,85,247,.1);color:var(--purple)}
+.cat-task .cat-tag{background:rgba(255,215,0,.1);color:var(--yellow)}
+.card-price{font-family:var(--hud);font-size:14px;font-weight:700;color:var(--green);white-space:nowrap}
+.card-title{font-size:13px;color:var(--text);margin-bottom:5px;line-height:1.5}
+.card-desc{font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:8px}
+.card-img{width:100%;max-height:150px;object-fit:cover;border-radius:5px;margin-bottom:8px;border:1px solid var(--border)}
+.card-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card-meta{font-size:10px;color:var(--text2)}
+.status-badge{font-size:10px;padding:2px 8px;border-radius:3px;white-space:nowrap}
+.s-open{background:rgba(0,255,136,.08);color:var(--green);border:1px solid rgba(0,255,136,.2)}
+.s-taken{background:rgba(255,107,0,.08);color:var(--orange);border:1px solid rgba(255,107,0,.2)}
+.s-done{background:rgba(80,88,112,.12);color:var(--text2);border:1px solid var(--border)}
+.school-hdr{background:linear-gradient(135deg,rgba(0,229,255,.08),rgba(168,85,247,.05));border:1px solid rgba(0,229,255,.2);border-radius:10px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.school-ico{width:42px;height:42px;border-radius:8px;background:linear-gradient(135deg,var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.school-name-d{font-family:var(--hud);font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px}
+.school-stats-d{font-size:10px;color:var(--text2)}
+.chat-box{background:var(--s1);border:1px solid var(--border);border-radius:8px;height:calc(100vh - 290px);min-height:240px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.cmsg{max-width:82%}
+.cmsg.mine{align-self:flex-end}
+.cmsg.theirs{align-self:flex-start}
+.cbubble{padding:8px 11px;border-radius:8px;font-size:12px;line-height:1.5}
+.mine .cbubble{background:rgba(0,255,136,.12);border:1px solid rgba(0,255,136,.2)}
+.theirs .cbubble{background:var(--card2);border:1px solid var(--border2)}
+.cnick{font-size:10px;font-weight:700;margin-bottom:3px;color:var(--cyan)}
+.cmeta{font-size:10px;color:var(--text2);margin-top:3px;padding:0 3px}
+.chat-row{display:flex;gap:8px}
+.chat-row .inp{flex:1}
+.bal-card{background:linear-gradient(135deg,rgba(0,229,255,.08),rgba(168,85,247,.04));border:1px solid rgba(0,229,255,.2);border-radius:10px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden}
+.bal-card::before{content:'';position:absolute;right:-10px;top:-10px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,255,.08),transparent 70%);pointer-events:none}
+.bal-lbl{font-size:10px;color:var(--text2);letter-spacing:1px;margin-bottom:5px}
+.bal-amt{font-family:var(--hud);font-size:34px;font-weight:900;color:var(--cyan);margin-bottom:2px}
+.bal-sub{font-size:10px;color:var(--text2)}
+.tx-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.tx-item:last-child{border-bottom:none}
+.tx-ico{font-size:20px;flex-shrink:0}
+.tx-body{flex:1;min-width:0}
+.tx-lbl{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-meta{font-size:10px;color:var(--text2);margin-top:2px}
+.tx-amt{font-family:var(--hud);font-size:12px;font-weight:700;white-space:nowrap}
+.tx-in{color:var(--green)}.tx-out{color:var(--red)}
+.wallet-copy{background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:11px;margin-bottom:12px;word-break:break-all;font-size:11px;color:var(--cyan);position:relative}
+.wallet-copy label{display:block;font-size:10px;color:var(--text2);margin-bottom:5px}
+.copy-btn{position:absolute;right:8px;top:8px;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);color:var(--cyan);padding:3px 8px;border-radius:3px;font-size:10px;cursor:pointer;font-family:var(--mono)}
+.copy-btn:hover{background:rgba(0,229,255,.2)}
+.prof-header{background:linear-gradient(135deg,var(--s2),var(--card));border:1px solid var(--border2);border-radius:10px;padding:18px;margin-bottom:14px;text-align:center}
+.avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 8px;box-shadow:0 0 18px rgba(0,255,136,.3)}
+.prof-nick-t{font-family:var(--hud);font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px}
+.prof-school-t{font-size:11px;color:var(--cyan);margin-bottom:6px}
+.stars{display:flex;gap:4px;justify-content:center;margin-bottom:6px}
+.star{font-size:22px;cursor:pointer;transition:transform .1s;color:var(--border2)}
+.star.lit{color:var(--yellow)}
+.star:hover{transform:scale(1.2)}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-title{font-family:var(--hud);font-size:11px;font-weight:700;letter-spacing:2px;color:var(--text)}
+.sec-sub{font-size:10px;color:var(--text2);display:flex;align-items:center;gap:4px}
+.cats{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px}
+.cats::-webkit-scrollbar{display:none}
+.cat-pill{white-space:nowrap;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:var(--mono);font-size:11px;border:1px solid var(--border2);color:var(--text2);background:var(--card);transition:all .2s}
+.cat-pill.on{border-color:var(--green);color:var(--green);background:rgba(0,255,136,.06)}
+.search-wrap{position:relative;margin-bottom:14px}
+.search-inp{padding-left:36px !important}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--text2);pointer-events:none}
+.search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text2);cursor:pointer;font-size:14px}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);z-index:500;align-items:flex-end;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--s2);border:1px solid var(--border2);border-radius:12px 12px 0 0;width:100%;max-width:540px;max-height:94vh;overflow-y:auto;padding:18px 16px 30px;animation:slideUp .24s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
+.modal-handle{width:32px;height:3px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
+.modal-title{font-family:var(--hud);font-size:13px;font-weight:700;color:var(--text);margin-bottom:16px;letter-spacing:1px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:6px;border:none;cursor:pointer;font-family:var(--mono);font-size:12px;font-weight:700;transition:all .2s}
+.btn-g{background:var(--green);color:#000;box-shadow:0 0 14px rgba(0,255,136,.3)}
+.btn-g:hover{box-shadow:0 0 24px rgba(0,255,136,.55);transform:translateY(-1px)}
+.btn-g:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-o{background:transparent;color:var(--text);border:1px solid var(--border2)}
+.btn-o:hover{border-color:var(--green);color:var(--green)}
+.btn-r{background:rgba(255,34,68,.1);color:var(--red);border:1px solid rgba(255,34,68,.25)}
+.btn-r:hover{background:rgba(255,34,68,.2)}
+.btn-c{background:rgba(0,229,255,.1);color:var(--cyan);border:1px solid rgba(0,229,255,.25)}
+.btn-full{width:100%;display:flex}
+.btn-sm{padding:6px 12px;font-size:11px}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:10px;color:var(--text2);margin-bottom:5px;letter-spacing:.8px}
+.inp{width:100%;background:var(--s1);border:1px solid var(--border2);border-radius:6px;padding:10px 12px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;transition:border-color .2s}
+.inp:focus{border-color:var(--green)}
+.inp::placeholder{color:var(--text2)}
+.inp.err{border-color:var(--red)}.inp.ok{border-color:var(--green)}
+textarea.inp{resize:vertical;min-height:76px}
+select.inp{appearance:none;cursor:pointer}
+.inp-hint{font-size:10px;margin-top:4px;display:none}
+.inp-hint.ok{display:block;color:var(--green)}.inp-hint.err{display:block;color:var(--red)}
+.info-box{font-size:11px;color:var(--text2);line-height:1.8;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:11px;margin-bottom:10px}
+.warn-box{font-size:11px;color:var(--red);line-height:1.8;background:rgba(255,34,68,.06);border:1px solid rgba(255,34,68,.2);border-radius:6px;padding:11px;margin-bottom:12px}
+.loader{text-align:center;padding:36px 16px;color:var(--text2)}
+.spin{display:inline-block;animation:spin 1s linear infinite;font-size:22px;margin-bottom:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:40px 16px;color:var(--text2)}
+.empty-icon{font-size:40px;margin-bottom:10px}
+.empty-text{font-size:12px;line-height:1.8}
+#toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--card2);border:1px solid var(--border2);padding:9px 16px;border-radius:7px;font-size:11px;opacity:0;transition:all .28s;z-index:999;pointer-events:none;white-space:nowrap;max-width:88vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.gap{height:10px}
+.row{display:flex;gap:10px}
+.row .field{flex:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo">СКУЛДРОП<sub>v5</sub></div>
+  <div class="hdr-r">
+
+    <button class="nick-btn" onclick="showScreen('profile')">
+      <div class="dot dot-p"></div><span id="hdr-nick">аноним</span>
+    </button>
+  </div>
+</header>
+
+<!-- SETUP -->
+<div id="screen-setup" style="display:flex">
+  <div class="setup-box">
+    <div class="setup-logo">СКУЛДРОП</div>
+    <div class="setup-tagline">// СОЦСЕТЬ + МАРКЕТПЛЕЙС</div>
+    <div class="auth-tabs">
+      <div class="auth-tab on" id="atab-reg" onclick="switchAuthTab('reg')">Регистрация</div>
+      <div class="auth-tab" id="atab-login" onclick="switchAuthTab('login')">Войти</div>
+    </div>
+    <!-- REGISTER -->
+    <div id="auth-reg">
+      <div style="font-size:11px;color:var(--text2);line-height:1.8;margin-bottom:16px;background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:10px">
+        🏫 <b style="color:var(--cyan)">Соцсеть</b> — чат школы, общение<br>
+        💼 <b style="color:var(--green)">Маркетплейс</b> — заказы, оплата наличными
+      </div>
+      <div class="field"><label>ПСЕВДОНИМ <span style="color:var(--red)">*</span></label>
+        <input class="inp" id="s-nick" placeholder="ghost_x, zero_77..." maxlength="20">
+      </div>
+      <div class="field"><label>ПАРОЛЬ <span style="color:var(--red)">*</span></label>
+        <input class="inp" type="password" id="s-pass" placeholder="минимум 6 символов">
+      </div>
+      <div class="field"><label>ПОВТОРИ ПАРОЛЬ <span style="color:var(--red)">*</span></label>
+        <input class="inp" type="password" id="s-pass2" placeholder="ещё раз">
+      </div>
+      <div class="field"><label>ШКОЛА <span style="color:var(--red)">*</span></label>
+        <div class="school-wrap">
+          <input class="inp" id="s-school" placeholder="Начни вводить: СОШ №5, Москва..."
+            autocomplete="off" oninput="schoolSearch(this.value)" onfocus="schoolSearch(this.value)">
+          <div class="school-drop" id="school-drop"></div>
+        </div>
+        <div style="font-size:10px;color:var(--text2);margin-top:4px">Формат: СОШ №5, Москва · Лицей №7, Казань · Гимназия №1, СПб</div>
+      </div>
+
+      <div class="warn-box">⚠️ Запомни пароль — восстановление не предусмотрено!</div>
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:14px;background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:10px">
+        <input type="checkbox" id="setup-agree" style="margin-top:2px;flex-shrink:0;width:14px;height:14px;cursor:pointer;accent-color:var(--green)">
+        <label for="setup-agree" style="font-size:10px;color:var(--text2);line-height:1.7;cursor:pointer">
+          Принимаю <span onclick="openModal('modal-agreement');event.preventDefault()" style="color:var(--cyan);cursor:pointer;text-decoration:underline">пользовательское соглашение</span>
+        </label>
+      </div>
+      <button class="btn btn-g btn-full" id="reg-btn" onclick="doRegister()">⚡ ЗАРЕГИСТРИРОВАТЬСЯ</button>
+    </div>
+    <!-- LOGIN -->
+    <div id="auth-login" style="display:none">
+      <div style="font-size:11px;color:var(--text2);line-height:1.8;margin-bottom:18px;background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:10px">
+        🔑 Войди с любого устройства по нику и паролю
+      </div>
+      <div class="field"><label>ПСЕВДОНИМ</label>
+        <input class="inp" id="l-nick" placeholder="твой ник">
+      </div>
+      <div class="field"><label>ПАРОЛЬ</label>
+        <input class="inp" type="password" id="l-pass" placeholder="твой пароль" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="btn btn-g btn-full" id="login-btn" onclick="doLogin()">🔑 ВОЙТИ</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main" style="display:none;flex:1">
+
+  <!-- FEED -->
+  <div class="screen active" id="screen-feed">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="inp search-inp" id="search-inp" placeholder="поиск заказов..." oninput="onSearch()">
+      <button class="search-clear" id="search-clear" onclick="clearSearch()" style="display:none">✕</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="btn btn-sm" id="scope-my" onclick="setScope('my')" style="flex:1;background:rgba(0,229,255,.1);color:var(--cyan);border:1px solid rgba(0,229,255,.3)">🏫 Моя школа</button>
+      <button class="btn btn-sm btn-o" id="scope-all" onclick="setScope('all')" style="flex:1">🌐 Все школы</button>
+    </div>
+    <div class="cats" id="cat-filters">
+      <div class="cat-pill on" data-cat="all">Все</div>
+      <div class="cat-pill" data-cat="hw">📚 ДЗ</div>
+      <div class="cat-pill" data-cat="food">🍕 Еда</div>
+      <div class="cat-pill" data-cat="notes">📝 Конспекты</div>
+      <div class="cat-pill" data-cat="task">⚡ Поручения</div>
+    </div>
+    <div class="sec-head">
+      <span class="sec-title">// ЛЕНТА</span>
+      <span class="sec-sub"><div class="dot dot-g"></div><span id="feed-cnt" style="font-size:10px;color:var(--green)">загрузка...</span></span>
+    </div>
+    <div id="feed-list"></div>
+  </div>
+
+  <!-- SCHOOL -->
+  <div class="screen" id="screen-school">
+    <div class="school-hdr">
+      <div class="school-ico">🏫</div>
+      <div>
+        <div class="school-name-d" id="school-name-d">—</div>
+        <div class="school-stats-d" id="school-stats-d">участников: —</div>
+      </div>
+    </div>
+    <div class="sec-head">
+      <span class="sec-title">// ЧАТ ШКОЛЫ</span>
+      <span style="font-size:10px;color:var(--green)" id="chat-live-ind">● live</span>
+    </div>
+    <div class="chat-box" id="school-chat-box">
+      <div class="loader"><div class="spin">⟳</div></div>
+    </div>
+    <div class="chat-row">
+      <input class="inp" id="school-chat-inp" placeholder="написать в чат школы..." maxlength="500"
+        onkeydown="if(event.key==='Enter')sendSchoolMsg()">
+      <button class="btn btn-g btn-sm" onclick="sendSchoolMsg()">→</button>
+    </div>
+  </div>
+
+  <!-- MY -->
+  <div class="screen" id="screen-my">
+    <div class="sec-head"><span class="sec-title">// МОИ ЗАКАЗЫ</span></div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="btn btn-sm btn-g" id="tab-p" onclick="switchTab('posted')">Мои заявки</button>
+      <button class="btn btn-sm btn-o" id="tab-t" onclick="switchTab('taken')">В работе</button>
+    </div>
+    <div id="my-list"></div>
+  </div>
+
+  <!-- POST -->
+  <div class="screen" id="screen-post">
+    <div class="sec-head"><span class="sec-title">// НОВЫЙ ЗАКАЗ</span></div>
+
+    <div id="post-form">
+      <div class="field"><label>КАТЕГОРИЯ</label>
+        <select class="inp" id="p-cat">
+          <option value="hw">📚 ДЗ / задача</option>
+          <option value="food">🍕 Доставка еды</option>
+          <option value="notes">📝 Конспект / шпора</option>
+          <option value="task">⚡ Личное поручение</option>
+        </select>
+      </div>
+      <div class="field"><label>ЗАГОЛОВОК</label>
+        <input class="inp" id="p-title" placeholder="Кратко о задаче" maxlength="100">
+      </div>
+      <div class="field"><label>ОПИСАНИЕ</label>
+        <textarea class="inp" id="p-desc" placeholder="Подробности, условия, сроки..."></textarea>
+      </div>
+      <div class="field"><label>ФОТО (необязательно)</label>
+        <input type="file" class="inp" id="p-photo" accept="image/*" style="padding:8px">
+      </div>
+      <div class="row">
+        <div class="field"><label>СУММА</label>
+          <input class="inp" id="p-amount" type="number" placeholder="0" min="1" step="any">
+        </div>
+        <div class="field"><label>ОПЛАТА</label>
+          <div style="background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.2);border-radius:6px;padding:9px 12px;font-size:12px;color:var(--yellow)">
+            💵 Наличные при встрече
+          </div>
+          <input type="hidden" id="p-cur" value="CASH">
+        </div>
+      </div>
+      <div class="field"><label>ДЕДЛАЙН (необязательно)</label>
+        <input class="inp" id="p-deadline" type="datetime-local">
+      </div>
+      <div class="info-box" style="border-color:rgba(255,215,0,.25);background:rgba(255,215,0,.04)">
+        💵 <b style="color:var(--yellow)">Оплата наличными при встрече.</b><br>
+        После взятия заказа договоритесь в чате — где и когда встретиться.
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:12px;background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:10px">
+        <input type="checkbox" id="agree-check" style="margin-top:2px;flex-shrink:0;width:14px;height:14px;cursor:pointer;accent-color:var(--green)">
+        <label for="agree-check" style="font-size:10px;color:var(--text2);line-height:1.7;cursor:pointer">
+          Согласен с <span onclick="openModal('modal-agreement');return false" style="color:var(--cyan);cursor:pointer;text-decoration:underline">пользовательским соглашением</span>
+        </label>
+      </div>
+      <button class="btn btn-g btn-full" id="post-btn" onclick="submitOrder()">⚡ ОПУБЛИКОВАТЬ ЗАКАЗ</button>
+    </div>
+  </div>
+
+  <!-- WALLET - removed, cash only -->
+  <div class="screen" id="screen-wallet" style="display:none"></div>
+
+  <!-- PROFILE -->
+  <div class="screen" id="screen-profile">
+    <div class="prof-header">
+      <div class="avatar" id="prof-av">?</div>
+      <div class="prof-nick-t" id="prof-nick-d">—</div>
+      <div class="prof-school-t" id="prof-school-d">—</div>
+      <div id="prof-rating-block" style="display:none;margin-bottom:8px">
+        <div style="color:var(--yellow);font-size:14px;letter-spacing:3px" id="prof-stars-d"></div>
+        <div style="font-size:11px;color:var(--text2)" id="prof-rcount-d"></div>
+      </div>
+    </div>
+<div class="gap"></div>
+    
+    <div class="sec-head"><span class="sec-title">// СМЕНИТЬ ПАРОЛЬ</span></div>
+    <div class="field"><label>ТЕКУЩИЙ ПАРОЛЬ</label>
+      <input class="inp" type="password" id="prof-old-pass" placeholder="текущий пароль">
+    </div>
+    <div class="field"><label>НОВЫЙ ПАРОЛЬ (мин. 6 символов)</label>
+      <input class="inp" type="password" id="prof-new-pass" placeholder="новый пароль">
+    </div>
+    <button class="btn btn-o btn-full" onclick="changePassword()">🔑 СМЕНИТЬ ПАРОЛЬ</button>
+    <div class="gap"></div>
+    <div class="info-box">🔒 Ник и пароль — вход с любого устройства.<br>🌐 Для анонимности — VPN + Tor.</div>
+    <button class="btn btn-r btn-full btn-sm" onclick="logout()">Выйти из аккаунта</button>
+  </div>
+</div>
+
+<nav id="nav" style="display:none">
+  <button class="nb active" id="nb-feed" onclick="showScreen('feed')"><span class="nb-icon">📡</span>лента</button>
+  <button class="nb" id="nb-school" onclick="showScreen('school')"><span class="nb-icon">🏫</span>школа</button>
+  <button class="nb-plus" onclick="showScreen('post')"><div class="plus-ring">+</div><span>заказ</span></button>
+  <button class="nb" id="nb-my" onclick="showScreen('my')"><span class="nb-icon">📋</span>мои</button>
+  <button class="nb" id="nb-profile" onclick="showScreen('profile')"><span class="nb-icon">👤</span>профиль</button>
+</nav>
+</div>
+
+
+
+
+
+<!-- MODAL: ДЕТАЛИ -->
+<div class="modal-bg" id="modal-detail">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div id="detail-body"></div>
+    <button class="btn btn-o btn-full btn-sm" onclick="closeModal('modal-detail')">Закрыть</button>
+  </div>
+</div>
+
+<!-- MODAL: ЧАТ ЗАКАЗА -->
+<div class="modal-bg" id="modal-order-chat">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="order-chat-title">💬 ЧАТ</div>
+    <div class="chat-box" id="order-chat-box"></div>
+    <div class="chat-row">
+      <input class="inp" id="order-chat-inp" placeholder="сообщение..." maxlength="500"
+        onkeydown="if(event.key==='Enter')sendOrderMsg()">
+      <button class="btn btn-g btn-sm" onclick="sendOrderMsg()">→</button>
+    </div>
+    <div class="gap"></div>
+    <button class="btn btn-o btn-full btn-sm" onclick="closeModal('modal-order-chat')">Закрыть</button>
+  </div>
+</div>
+
+<!-- MODAL: ОЦЕНИТЬ -->
+<div class="modal-bg" id="modal-rate">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⭐ ОЦЕНИТЬ</div>
+    <div style="text-align:center;margin-bottom:16px">
+      <div class="stars" id="rate-stars">
+        <span class="star" data-v="1" onclick="setStar(1)">★</span>
+        <span class="star" data-v="2" onclick="setStar(2)">★</span>
+        <span class="star" data-v="3" onclick="setStar(3)">★</span>
+        <span class="star" data-v="4" onclick="setStar(4)">★</span>
+        <span class="star" data-v="5" onclick="setStar(5)">★</span>
+      </div>
+      <div style="font-size:11px;color:var(--text2)" id="star-label">выбери оценку</div>
+    </div>
+    <div class="field"><label>КОММЕНТАРИЙ (необязательно)</label>
+      <textarea class="inp" id="rate-comment" style="min-height:60px" maxlength="200"></textarea>
+    </div>
+    <button class="btn btn-g btn-full" onclick="submitRating()">✅ ОТПРАВИТЬ</button>
+    <div class="gap"></div>
+    <button class="btn btn-o btn-full btn-sm" onclick="closeModal('modal-rate')">Отмена</button>
+  </div>
+</div>
+
+<!-- MODAL: ЖАЛОБА -->
+<div class="modal-bg" id="modal-report">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🚩 ЖАЛОБА</div>
+    <div class="field"><label>ПРИЧИНА</label>
+      <textarea class="inp" id="report-reason" style="min-height:80px" maxlength="300"></textarea>
+    </div>
+    <button class="btn btn-r btn-full" onclick="submitReport()">🚩 ОТПРАВИТЬ</button>
+    <div class="gap"></div>
+    <button class="btn btn-o btn-full btn-sm" onclick="closeModal('modal-report')">Отмена</button>
+  </div>
+</div>
+
+<!-- MODAL: СОГЛАШЕНИЕ -->
+<div class="modal-bg" id="modal-agreement">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📋 ПОЛЬЗОВАТЕЛЬСКОЕ СОГЛАШЕНИЕ</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.9;max-height:55vh;overflow-y:auto;padding-right:4px">
+      <b style="color:var(--text)">1. ПЛАТФОРМА</b><br>
+      СКУЛДРОП — информационная платформа (соцсеть + маркетплейс). Администрация не является стороной сделок между пользователями.<br><br>
+      <b style="color:var(--text)">2. ОТВЕТСТВЕННОСТЬ</b><br>
+      Администрация <b style="color:var(--red)">не несёт ответственности</b> за качество выполнения заказов, споры между пользователями, невыполнение обязательств и убытки.<br><br>
+      <b style="color:var(--text)">3. КОМИССИЯ</b><br>
+      Комиссия: <b style="color:var(--green)">0%</b>. Все расчёты наличными напрямую между пользователями.<br><br>
+      <b style="color:var(--text)">4. ЗАПРЕЩЕНО</b><br>
+      Незаконные заказы, оружие, наркотики, угрозы, оскорбления.<br><br>
+      <b style="color:var(--text)">5. БЛОКИРОВКА</b><br>
+      Администрация вправе заблокировать нарушителей без объяснений.<br><br>
+      <b style="color:var(--text)">6. КОНФИДЕНЦИАЛЬНОСТЬ</b><br>
+      Персональные данные не собираются. Пароль хранится в виде SHA-256 хэша.<br><br>
+      <b style="color:var(--red)">Регистрируясь вы принимаете все условия соглашения.</b>
+    </div>
+    <div class="gap"></div>
+    <button class="btn btn-g btn-full" onclick="closeModal('modal-agreement');['setup-agree','agree-check'].forEach(id=>{const el=document.getElementById(id);if(el)el.checked=true})">✅ ПРИНИМАЮ</button>
+    <div class="gap"></div>
+    <button class="btn btn-o btn-full btn-sm" onclick="closeModal('modal-agreement')">Закрыть</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════
+// ⚙️ ВСТАВЬ СВОИ ДАННЫЕ
+// ════════════════════════════════
+const WORKER_URL   = 'https://healthy-kingfisher-53.mirrorrrr.deno.net/';
+const SUPABASE_URL = 'https://isognckwqrwkmgkzigqh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlzb2duY2t3cXJ3a21na3ppZ3FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NzcxODYsImV4cCI6MjA4OTI1MzE4Nn0.UlkdlXVP1V8dD7DehXTqOEtuIN2yyZjDhGM9S4DoPgI';
+// ════════════════════════════════
+
+const COMMISSION = 0.05;
+const DB_OK = SUPABASE_URL !== 'YOUR_SUPABASE_URL';
+let sb = DB_OK ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+let P = { nick:'', school:'', schoolId:null };
+let myTaken=[], currentCat='all', myTab='posted', feedScope='my';
+let rateOrderId=null, reportOrderId=null, orderChatId=null, selectedStar=0;
+let searchQuery='', allOrders=[], schoolChatTimer=null, selectedSchoolId=null;
+
+function loadLocal(){
+  try{
+    const p=localStorage.getItem('sd_p');if(p)P=JSON.parse(p);
+    const t=localStorage.getItem('sd_t');if(t)myTaken=JSON.parse(t);
+  }catch(e){}
+}
+function saveLocal(){
+  localStorage.setItem('sd_p',JSON.stringify(P));
+  localStorage.setItem('sd_t',JSON.stringify(myTaken));
+}
+function rl(key,limit,ms){
+  const now=Date.now();
+  let d=JSON.parse(localStorage.getItem('rl_'+key)||'{"ts":0,"c":0}');
+  if(now-d.ts>ms)d={ts:now,c:0};
+  if(d.c>=limit)return false;
+  d.c++;localStorage.setItem('rl_'+key,JSON.stringify(d));return true;
+}
+async function api(method,path,body){
+  if(WORKER_URL==='YOUR_WORKER_URL')throw new Error('Вставь Worker URL в код');
+  const opts={method,headers:{'Content-Type':'application/json'}};
+  if(body)opts.body=JSON.stringify(body);
+  const res=await fetch(WORKER_URL+path,opts);
+  const d=await res.json().catch(()=>({}));
+  if(!res.ok)throw new Error(d.error||'Ошибка сервера');
+  return d;
+}
+
+
+async function hashPassword(pass){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pass));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── SCHOOL SEARCH ─────────────────────────────────────
+async function schoolSearch(query){
+  const drop=document.getElementById('school-drop');
+  if(!query||query.length<1){drop.classList.remove('open');return;}
+  if(!DB_OK){
+    drop.innerHTML=`<div class="school-opt new-s" onclick="createAndSelectSchool('${esc(query)}')">+ Создать: ${esc(query)}</div>`;
+    drop.classList.add('open');return;
+  }
+  try{
+    const{data}=await sb.from('schools').select('id,name').ilike('name',`%${query}%`).limit(8);
+    let html='';
+    if(data?.length)html=data.map(s=>`<div class="school-opt" onclick="selectSchool(${s.id},'${esc(s.name)}')">${esc(s.name)}</div>`).join('');
+    html+=`<div class="school-opt new-s" onclick="createAndSelectSchool('${esc(query)}')">+ Создать: ${esc(query)}</div>`;
+    drop.innerHTML=html;drop.classList.add('open');
+  }catch(e){drop.classList.remove('open');}
+}
+function selectSchool(id,name){
+  selectedSchoolId=id;
+  document.getElementById('s-school').value=name;
+  document.getElementById('school-drop').classList.remove('open');
+}
+async function createAndSelectSchool(name){
+  if(!DB_OK){selectedSchoolId=-1;document.getElementById('s-school').value=name;document.getElementById('school-drop').classList.remove('open');return;}
+  try{
+    const{data,error}=await sb.from('schools').insert({name}).select('id').single();
+    if(error&&error.code==='23505'){
+      const{data:ex}=await sb.from('schools').select('id').eq('name',name).single();
+      selectedSchoolId=ex.id;
+    }else{selectedSchoolId=data.id;}
+    document.getElementById('s-school').value=name;
+    document.getElementById('school-drop').classList.remove('open');
+  }catch(e){toast('❌ '+e.message);}
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.school-wrap'))document.getElementById('school-drop')?.classList.remove('open');
+});
+
+// ── AUTH ──────────────────────────────────────────────
+function switchAuthTab(tab){
+  document.getElementById('atab-reg').classList.toggle('on',tab==='reg');
+  document.getElementById('atab-login').classList.toggle('on',tab==='login');
+  document.getElementById('auth-reg').style.display=tab==='reg'?'block':'none';
+  document.getElementById('auth-login').style.display=tab==='login'?'block':'none';
+}
+async function doRegister(){
+  const nick=document.getElementById('s-nick').value.trim();
+  const pass=document.getElementById('s-pass').value;
+  const pass2=document.getElementById('s-pass2').value;
+  const school=document.getElementById('s-school').value.trim();
+  if(!nick||nick.length<2){toast('⚠️ Введи псевдоним (мин. 2 символа)');return;}
+  if(!pass||pass.length<6){toast('⚠️ Пароль минимум 6 символов');return;}
+  if(pass!==pass2){toast('⚠️ Пароли не совпадают');return;}
+  if(!school||!selectedSchoolId){toast('⚠️ Выбери школу из списка');return;}
+  if(!document.getElementById('setup-agree').checked){toast('⚠️ Прими соглашение');openModal('modal-agreement');return;}
+  const btn=document.getElementById('reg-btn');
+  btn.disabled=true;btn.textContent='регистрируем...';
+  try{
+    const passHash=await hashPassword(pass);
+    await api('POST','/api/auth/register',{nick,passHash,wallet:'',schoolId:selectedSchoolId,schoolName:school});
+    P={nick,school,schoolId:selectedSchoolId};
+    saveLocal();enterApp();
+  }catch(e){toast('❌ '+e.message);}
+  btn.disabled=false;btn.textContent='⚡ ЗАРЕГИСТРИРОВАТЬСЯ';
+}
+async function doLogin(){
+  const nick=document.getElementById('l-nick').value.trim();
+  const pass=document.getElementById('l-pass').value;
+  if(!nick){toast('⚠️ Введи ник');return;}
+  if(!pass){toast('⚠️ Введи пароль');return;}
+  const btn=document.getElementById('login-btn');
+  btn.disabled=true;btn.textContent='входим...';
+  try{
+    const passHash=await hashPassword(pass);
+    const d=await api('POST','/api/auth/login',{nick,passHash});
+    P={nick,school:d.school||'',schoolId:d.schoolId||null};
+    saveLocal();enterApp();
+  }catch(e){toast('❌ '+e.message);}
+  btn.disabled=false;btn.textContent='🔑 ВОЙТИ';
+}
+function enterApp(){
+  document.getElementById('screen-setup').style.display='none';
+  document.getElementById('main').style.display='block';
+  document.getElementById('nav').style.display='flex';
+  document.getElementById('hdr-nick').textContent=P.nick;
+  showScreen('feed');
+  renderProfile();
+}
+function logout(){
+  if(!confirm('Выйти из аккаунта?'))return;
+  clearInterval(schoolChatTimer);
+  localStorage.clear();location.reload();
+}
+
+
+
+// ── BALANCE ───────────────────────────────────────────
+function updateBalanceUI(){saveLocal();}
+async function syncBalance(){}
+
+
+
+// ── SCREENS ───────────────────────────────────────────
+const SCREENS=['feed','school','my','post','profile'];
+function showScreen(name){
+  SCREENS.forEach(s=>{
+    document.getElementById('screen-'+s)?.classList.remove('active');
+    document.getElementById('nb-'+s)?.classList.remove('active');
+  });
+  document.getElementById('screen-'+name).classList.add('active');
+  document.getElementById('nb-'+name)?.classList.add('active');
+  clearInterval(schoolChatTimer);
+  if(name==='feed')loadFeed();
+  if(name==='school'){loadSchoolScreen();schoolChatTimer=setInterval(loadSchoolMessages,5000);}
+  if(name==='my')loadMy();
+  if(name==='post')renderPost();
+
+  if(name==='profile')loadProfile();
+}
+
+// ── SCHOOL SCREEN ─────────────────────────────────────
+async function loadSchoolScreen(){
+  if(!DB_OK||!P.schoolId)return;
+  try{
+    const{data:school}=await sb.from('schools').select('name').eq('id',P.schoolId).single();
+    const{count}=await sb.from('users').select('*',{count:'exact',head:true}).eq('school_id',P.schoolId);
+    document.getElementById('school-name-d').textContent=school?.name||P.school;
+    document.getElementById('school-stats-d').textContent='участников: '+(count||0);
+  }catch(e){}
+  loadSchoolMessages();
+}
+async function loadSchoolMessages(){
+  if(!DB_OK||!P.schoolId)return;
+  const box=document.getElementById('school-chat-box');
+  const wasBottom=box.scrollHeight-box.scrollTop-box.clientHeight<60;
+  try{
+    const{data}=await sb.from('school_messages').select('*').eq('school_id',P.schoolId).order('created_at',{ascending:true}).limit(100);
+    if(!data?.length){box.innerHTML='<div style="text-align:center;color:var(--text2);font-size:11px;padding:30px">Будь первым — напиши в чат 👋</div>';return;}
+    box.innerHTML=data.map(m=>`
+      <div class="cmsg ${m.nick===P.nick?'mine':'theirs'}">
+        ${m.nick!==P.nick?`<div class="cnick">${esc(m.nick)}</div>`:''}
+        <div class="cbubble">${esc(m.message)}</div>
+        <div class="cmeta">${timeAgo(m.created_at)}</div>
+      </div>`).join('');
+    if(wasBottom)box.scrollTop=box.scrollHeight;
+  }catch(e){}
+}
+async function sendSchoolMsg(){
+  const msg=document.getElementById('school-chat-inp').value.trim();
+  if(!msg||!P.schoolId)return;
+  if(!rl('school_chat',30,60000)){toast('⛔ Слишком быстро');return;}
+  try{
+    await api('POST','/api/school/message',{nick:P.nick,schoolId:P.schoolId,message:msg});
+    document.getElementById('school-chat-inp').value='';
+    await loadSchoolMessages();
+    document.getElementById('school-chat-box').scrollTop=9999;
+  }catch(e){toast('❌ '+e.message);}
+}
+
+// ── FEED ──────────────────────────────────────────────
+function setScope(scope){
+  feedScope=scope;
+  document.getElementById('scope-my').className=scope==='my'?'btn btn-sm':'btn btn-sm btn-o';
+  document.getElementById('scope-my').style.cssText=scope==='my'?'flex:1;background:rgba(0,229,255,.1);color:var(--cyan);border:1px solid rgba(0,229,255,.3)':'flex:1';
+  document.getElementById('scope-all').className=scope==='all'?'btn btn-sm btn-g':'btn btn-sm btn-o';
+  document.getElementById('scope-all').style.cssText='flex:1';
+  loadFeed();
+}
+async function loadFeed(){
+  const list=document.getElementById('feed-list');
+  list.innerHTML=`<div class="loader"><div class="spin">⟳</div><div>загрузка...</div></div>`;
+  if(!DB_OK){
+    list.innerHTML=`<div class="empty"><div class="empty-icon">⚙️</div><div class="empty-text">Вставь ключи в код.<br>Смотри README.md</div></div>`;
+    document.getElementById('feed-cnt').textContent='нет БД';return;
+  }
+  try{
+    let q=sb.from('orders').select('*').order('created_at',{ascending:false});
+    if(currentCat!=='all')q=q.eq('cat',currentCat);
+    if(searchQuery)q=q.ilike('title',`%${searchQuery}%`);
+    if(feedScope==='my'&&P.schoolId)q=q.eq('school_id',P.schoolId);
+    const{data,error}=await q;
+    if(error)throw error;
+    allOrders=data||[];
+    document.getElementById('feed-cnt').textContent=allOrders.filter(o=>o.status==='open').length+' открытых';
+    list.innerHTML=allOrders.length?allOrders.map(orderCard).join('')
+      :`<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Пока нет заказов.<br>Нажми + чтобы добавить.</div></div>`;
+  }catch(e){list.innerHTML=`<div class="empty"><div class="empty-icon">❌</div><div class="empty-text">${esc(e.message)}</div></div>`;}
+}
+document.getElementById('cat-filters').addEventListener('click',e=>{
+  const pill=e.target.closest('.cat-pill');if(!pill)return;
+  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('on'));
+  pill.classList.add('on');currentCat=pill.dataset.cat;loadFeed();
+});
+let searchTimer;
+function onSearch(){
+  const v=document.getElementById('search-inp').value.trim();
+  document.getElementById('search-clear').style.display=v?'block':'none';
+  clearTimeout(searchTimer);searchTimer=setTimeout(()=>{searchQuery=v;loadFeed();},400);
+}
+function clearSearch(){
+  document.getElementById('search-inp').value='';
+  document.getElementById('search-clear').style.display='none';
+  searchQuery='';loadFeed();
+}
+function orderCard(o){
+  const cats={hw:'📚 ДЗ',food:'🍕 Еда',notes:'📝 Конспект',task:'⚡ Поручение'};
+  const statLabel={open:'● ОТКРЫТ',taken:'● В РАБОТЕ',done:'● ВЫПОЛНЕН'};
+  const statClass={open:'s-open',taken:'s-taken',done:'s-done'};
+  const priceStr=esc(o.amount)+' ₽ 💵';
+  const schoolTag=o.school_name&&feedScope==='all'?`<span style="font-size:9px;color:var(--cyan);margin-left:6px">🏫${esc(o.school_name)}</span>`:'';
+  const img=o.photo_url?`<img class="card-img" src="${esc(o.photo_url)}" onerror="this.style.display='none'">` :'';
+  return `<div class="order-card cat-${esc(o.cat)}" onclick="openDetail('${o.id}')">
+    <div class="card-top"><span class="cat-tag">${cats[o.cat]||o.cat}</span><span class="card-price">${priceStr}</span></div>
+    <div class="card-title">${esc(o.title)}</div>
+    ${o.description?`<div class="card-desc">${esc(o.description).slice(0,110)}${(o.description||'').length>110?'...':''}</div>`:''}
+    ${img}
+    <div class="card-bottom">
+      <span class="card-meta">${esc(o.author_nick)}${schoolTag} · ${timeAgo(o.created_at)}</span>
+      <span class="status-badge ${statClass[o.status]||''}">${statLabel[o.status]||o.status}</span>
+    </div>
+  </div>`;
+}
+
+// ── DETAIL ────────────────────────────────────────────
+async function openDetail(id){
+  let o=allOrders.find(x=>x.id===id);
+  if(!o&&DB_OK){const{data}=await sb.from('orders').select('*').eq('id',id).single();o=data;}
+  if(!o)return;
+  const cats={hw:'📚 ДЗ',food:'🍕 Еда',notes:'📝 Конспект',task:'⚡ Поручение'};
+  const isMine=o.author_nick===P.nick;
+  const iAmTaker=myTaken.includes(id);
+  const priceStr=esc(o.amount)+' ₽ 💵';
+  const img=o.photo_url?`<img class="card-img" src="${esc(o.photo_url)}" style="margin-bottom:12px" onerror="this.style.display='none'">` :'';
+  let ratHtml='';
+  if(DB_OK){
+    const{data:rats}=await sb.from('ratings').select('score').eq('to_nick',o.author_nick);
+    if(rats?.length){
+      const avg=(rats.reduce((s,r)=>s+r.score,0)/rats.length).toFixed(1);
+      const r=Math.round(+avg);
+      ratHtml=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="font-family:var(--hud);font-size:18px;color:var(--yellow)">${avg}</span>
+        <span style="color:var(--yellow);letter-spacing:2px">${'★'.repeat(r)}${'☆'.repeat(5-r)}</span>
+        <span style="font-size:10px;color:var(--text2)">${rats.length} оценок</span>
+      </div>`;
+    }
+  }
+  let payInfo='';
+  if(o.status==='taken'&&(isMine||iAmTaker)){
+    payInfo=`<div style="background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.2);border-radius:7px;padding:11px;margin-bottom:12px;font-size:11px;color:var(--text2);line-height:1.8">💵 Оплата наличными — договоритесь в чате где и когда встретиться.</div>`;
+  }
+  let btns='';
+  if(o.status==='open'&&!isMine)btns+=`<button class="btn btn-g btn-full" style="margin-bottom:8px" onclick="takeOrder('${id}')">⚡ ВЗЯТЬ В РАБОТУ</button>`;
+  if(isMine&&o.status==='taken')btns+=`<button class="btn btn-o btn-full btn-sm" style="margin-bottom:8px" onclick="confirmDone('${id}')">✅ ПОДТВЕРДИТЬ ВЫПОЛНЕНИЕ</button>`;
+  if(o.status==='done'&&(isMine||iAmTaker))btns+=`<button class="btn btn-sm btn-o" style="margin-bottom:8px" onclick="openRateModal('${id}')">⭐ Оценить</button> `;
+  if((isMine||iAmTaker)&&o.status==='taken')btns+=`<button class="btn btn-sm btn-o" style="margin-bottom:8px" onclick="openOrderChat('${id}')">💬 Чат</button> `;
+  if(!isMine)btns+=`<button class="btn btn-sm btn-r" style="margin-bottom:8px" onclick="openReport('${id}')">🚩</button>`;
+  if(isMine&&o.status==='open')btns+=`<button class="btn btn-r btn-full btn-sm" style="margin-bottom:8px" onclick="cancelOrder('${id}')">↩️ Отменить</button>`;
+  document.getElementById('detail-body').innerHTML=`
+    <div class="modal-title">${esc(o.title)}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <span class="cat-tag cat-${esc(o.cat)}" style="padding:4px 10px;border-radius:4px;font-size:11px">${cats[o.cat]||o.cat}</span>
+      <span style="font-family:var(--hud);font-size:20px;color:var(--green);font-weight:700">${priceStr}</span>
+    </div>
+    ${ratHtml}${img}
+    ${o.description?`<div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:12px">${esc(o.description)}</div>`:''}
+    ${o.deadline?`<div style="font-size:11px;color:var(--text2);margin-bottom:12px">⏰ ${new Date(o.deadline).toLocaleString('ru')}</div>`:''}
+    ${o.school_name?`<div style="font-size:11px;color:var(--cyan);margin-bottom:12px">🏫 ${esc(o.school_name)}</div>`:''}
+    <div style="font-size:11px;color:var(--text2);margin-bottom:14px">👤 ${esc(o.author_nick)} · ${timeAgo(o.created_at)}</div>
+    ${payInfo}
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">${btns}</div>`;
+  openModal('modal-detail');
+}
+async function takeOrder(id){
+  if(!rl('take',10,3600000)){toast('⛔ Максимум 10 заказов в час');return;}
+  try{
+    await api('PUT',`/api/orders/${id}/take`,{nick:P.nick});
+    myTaken.push(id);saveLocal();
+    closeModal('modal-detail');loadFeed();
+    toast('✅ Заказ взят! Договорись с заказчиком в чате.');
+  }catch(e){toast('❌ '+e.message);}
+}
+async function confirmDone(id){
+  if(!confirm('Подтвердить? Деньги уйдут исполнителю.'))return;
+  try{
+    const d=await api('PUT',`/api/orders/${id}/done`,{nick:P.nick});
+    // cash only - no balance changes
+    closeModal('modal-detail');loadFeed();
+    toast('✅ Выполнено! Не забудьте рассчитаться наличными.');
+  }catch(e){toast('❌ '+e.message);}
+}
+async function cancelOrder(id){
+  if(!confirm('Отменить заказ? Деньги вернутся.'))return;
+  try{
+    await api('DELETE',`/api/orders/${id}`,{nick:P.nick});
+    // cash only - no balance changes
+    closeModal('modal-detail');loadFeed();
+    toast('↩️ Отменено, деньги возвращены.');
+  }catch(e){toast('❌ '+e.message);}
+}
+
+// ── MY ────────────────────────────────────────────────
+async function loadMy(){
+  const list=document.getElementById('my-list');
+  list.innerHTML=`<div class="loader"><div class="spin">⟳</div></div>`;
+  if(!DB_OK){list.innerHTML=`<div class="empty"><div class="empty-icon">⚙️</div><div class="empty-text">Настрой базу данных</div></div>`;return;}
+  try{
+    let orders=[];
+    if(myTab==='posted'){
+      const{data}=await sb.from('orders').select('*').eq('author_nick',P.nick).order('created_at',{ascending:false});
+      orders=data||[];
+    }else{
+      if(!myTaken.length)orders=[];
+      else{const{data}=await sb.from('orders').select('*').in('id',myTaken).order('created_at',{ascending:false});orders=data||[];}
+    }
+    list.innerHTML=orders.length?orders.map(orderCard).join('')
+      :`<div class="empty"><div class="empty-icon">${myTab==='posted'?'📭':'🔍'}</div>
+         <div class="empty-text">${myTab==='posted'?'Ты ещё не создавал заказов':'Ты ещё не брал заказов'}</div></div>`;
+  }catch(e){list.innerHTML=`<div class="empty"><div class="empty-icon">❌</div><div class="empty-text">${esc(e.message)}</div></div>`;}
+}
+function switchTab(tab){
+  myTab=tab;
+  document.getElementById('tab-p').className=tab==='posted'?'btn btn-sm btn-g':'btn btn-sm btn-o';
+  document.getElementById('tab-t').className=tab==='taken'?'btn btn-sm btn-g':'btn btn-sm btn-o';
+  loadMy();
+}
+
+// ── POST ──────────────────────────────────────────────
+function renderPost(){
+  document.getElementById('post-form').style.display='block';
+}
+async function submitOrder(){
+  const title=document.getElementById('p-title').value.trim();
+  const desc=document.getElementById('p-desc').value.trim();
+  const amount=+document.getElementById('p-amount').value;
+  const cur=document.getElementById('p-cur').value;
+  const cat=document.getElementById('p-cat').value;
+  const dl=document.getElementById('p-deadline').value;
+  const photo=document.getElementById('p-photo').files[0];
+  if(!title){toast('⚠️ Введи заголовок');return;}
+  if(!amount||amount<=0){toast('⚠️ Введи сумму');return;}
+  if(!document.getElementById('agree-check').checked){toast('⚠️ Прими соглашение');openModal('modal-agreement');return;}
+
+  if(!rl('post',5,3600000)){toast('⛔ Максимум 5 заказов в час');return;}
+  const btn=document.getElementById('post-btn');
+  btn.disabled=true;btn.textContent='публикуем...';
+  let photo_url='';
+  if(photo)photo_url=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(photo);});
+  try{
+    await api('POST','/api/orders',{cat,title,description:desc,amount,currency:cur,deadline:dl||null,photo_url,nick:P.nick,schoolId:P.schoolId});
+
+    ['p-title','p-desc','p-amount','p-deadline'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('p-photo').value='';
+    document.getElementById('agree-check').checked=false;
+    showScreen('feed');
+    toast('✅ Заказ опубликован! Договоритесь в чате.');
+  }catch(e){toast('❌ '+e.message);}
+  btn.disabled=false;btn.textContent='⚡ ОПУБЛИКОВАТЬ ЗАКАЗ';
+}
+
+// ── ORDER CHAT ────────────────────────────────────────
+async function openOrderChat(orderId){
+  orderChatId=orderId;
+  const o=allOrders.find(x=>x.id===orderId);
+  document.getElementById('order-chat-title').textContent='💬 '+(o?.title||'').slice(0,30);
+  await loadOrderMessages();
+  openModal('modal-order-chat');
+}
+async function loadOrderMessages(){
+  if(!DB_OK)return;
+  const{data}=await sb.from('messages').select('*').eq('order_id',orderChatId).order('created_at',{ascending:true});
+  const box=document.getElementById('order-chat-box');
+  if(!data?.length){box.innerHTML='<div style="text-align:center;color:var(--text2);font-size:11px;padding:20px">Сообщений пока нет</div>';return;}
+  box.innerHTML=data.map(m=>`
+    <div class="cmsg ${m.nick===P.nick?'mine':'theirs'}">
+      ${m.nick!==P.nick?`<div class="cnick">${esc(m.nick)}</div>`:''}
+      <div class="cbubble">${esc(m.message)}</div>
+      <div class="cmeta">${timeAgo(m.created_at)}</div>
+    </div>`).join('');
+  box.scrollTop=box.scrollHeight;
+}
+async function sendOrderMsg(){
+  const msg=document.getElementById('order-chat-inp').value.trim();
+  if(!msg||!orderChatId)return;
+  if(!rl('chat',30,60000)){toast('⛔ Слишком быстро');return;}
+  try{
+    await api('POST','/api/chat',{order_id:orderChatId,nick:P.nick,message:msg});
+    document.getElementById('order-chat-inp').value='';
+    await loadOrderMessages();
+  }catch(e){toast('❌ '+e.message);}
+}
+
+// ── RATING ────────────────────────────────────────────
+function openRateModal(orderId){
+  rateOrderId=orderId;selectedStar=0;
+  document.querySelectorAll('.star').forEach(s=>s.classList.remove('lit'));
+  document.getElementById('star-label').textContent='выбери оценку';
+  document.getElementById('rate-comment').value='';
+  openModal('modal-rate');
+}
+function setStar(v){
+  selectedStar=v;
+  const labels=['','Плохо','Не очень','Нормально','Хорошо','Отлично!'];
+  document.getElementById('star-label').textContent=labels[v];
+  document.querySelectorAll('.star').forEach(s=>s.classList.toggle('lit',+s.dataset.v<=v));
+}
+async function submitRating(){
+  if(!selectedStar){toast('⚠️ Выбери оценку');return;}
+  const o=allOrders.find(x=>x.id===rateOrderId);if(!o)return;
+  const toNick=myTaken.includes(rateOrderId)?o.taker_nick:o.author_nick;
+  try{
+    await api('POST','/api/rate',{order_id:rateOrderId,from_nick:P.nick,to_nick:toNick,score:selectedStar,comment:document.getElementById('rate-comment').value.trim()});
+    closeModal('modal-rate');toast('⭐ Оценка отправлена!');
+  }catch(e){toast('❌ '+e.message);}
+}
+
+// ── REPORT ────────────────────────────────────────────
+function openReport(orderId){reportOrderId=orderId;document.getElementById('report-reason').value='';openModal('modal-report');}
+async function submitReport(){
+  const reason=document.getElementById('report-reason').value.trim();
+  if(!reason){toast('⚠️ Введи причину');return;}
+  try{await api('POST','/api/report',{order_id:reportOrderId,reporter_nick:P.nick,reason});closeModal('modal-report');toast('🚩 Жалоба отправлена');}
+  catch(e){toast('❌ '+e.message);}
+}
+
+// ── PROFILE ───────────────────────────────────────────
+async function loadProfile(){
+  renderProfile();
+  if(!DB_OK)return;
+  try{
+    const{data:rats}=await sb.from('ratings').select('score').eq('to_nick',P.nick);
+    if(rats?.length){
+      const avg=(rats.reduce((s,r)=>s+r.score,0)/rats.length).toFixed(1);
+      const r=Math.round(+avg);
+      document.getElementById('prof-stars-d').textContent='★'.repeat(r)+'☆'.repeat(5-r);
+      document.getElementById('prof-rcount-d').textContent=rats.length+' оценок · '+avg+' из 5';
+      document.getElementById('prof-rating-block').style.display='block';
+    }
+  }catch(e){}
+}
+function renderProfile(){
+  document.getElementById('prof-av').textContent=P.nick?P.nick[0].toUpperCase():'?';
+  document.getElementById('prof-nick-d').textContent=P.nick||'аноним';
+  document.getElementById('prof-school-d').textContent='🏫 '+(P.school||'—');
+  document.getElementById('hdr-nick').textContent=P.nick||'аноним';
+}
+
+async function changePassword(){
+  const oldPass=document.getElementById('prof-old-pass').value;
+  const newPass=document.getElementById('prof-new-pass').value;
+  if(!oldPass){toast('⚠️ Введи текущий пароль');return;}
+  if(!newPass||newPass.length<6){toast('⚠️ Новый пароль минимум 6 символов');return;}
+  try{
+    const oldHash=await hashPassword(oldPass);
+    const newHash=await hashPassword(newPass);
+    await api('POST','/api/auth/update',{nick:P.nick,passHash:oldHash,newPassHash:newHash});
+    document.getElementById('prof-old-pass').value='';
+    document.getElementById('prof-new-pass').value='';
+    toast('✅ Пароль изменён!');
+  }catch(e){toast('❌ '+e.message);}
+}
+
+// ── UTILS ─────────────────────────────────────────────
+function copyText(txt){navigator.clipboard.writeText(txt).then(()=>toast('📋 Скопировано'));}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-bg').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('open');}));
+let toastT;
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2800);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function timeAgo(ts){const d=Date.now()-new Date(ts).getTime();if(d<60000)return 'только что';if(d<3600000)return Math.floor(d/60000)+'м назад';if(d<86400000)return Math.floor(d/3600000)+'ч назад';return Math.floor(d/86400000)+'д назад';}
+
+// ── INIT ──────────────────────────────────────────────
+loadLocal();
+if(P.nick)enterApp();
+</script>
+</body>
+</html>
