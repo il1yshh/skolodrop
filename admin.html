@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>СКУЛДРОП // ADMIN v5</title>
+<title>СКУЛДРОП // ADMIN v6</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -23,7 +23,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 #admin-screen{display:none;position:relative;z-index:1;padding:20px;max-width:960px;margin:0 auto}
 .admin-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:rgba(2,2,4,.96);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);margin:-20px -20px 20px}
 .admin-logo{font-family:var(--hud);font-size:14px;font-weight:900;color:var(--red);letter-spacing:3px}
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:20px}
 .stat-card{background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:14px;text-align:center;cursor:pointer;transition:border-color .2s}
 .stat-card:hover{border-color:var(--border2)}
 .stat-val{font-family:var(--hud);font-size:22px;font-weight:700;margin-bottom:4px}
@@ -55,6 +55,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .b-open{background:rgba(0,255,136,.08);color:var(--green);border:1px solid rgba(0,255,136,.2)}
 .b-taken{background:rgba(255,107,0,.08);color:var(--orange);border:1px solid rgba(255,107,0,.2)}
 .b-done{background:rgba(80,88,112,.1);color:var(--text2);border:1px solid var(--border)}
+.post-card{background:var(--card);border:1px solid var(--border2);border-radius:7px;padding:12px;margin-bottom:8px}
+.post-content{font-size:12px;color:var(--text);margin-bottom:8px;line-height:1.6}
+.post-media{max-width:100%;max-height:150px;border-radius:5px;margin-bottom:8px}
 .btn{display:inline-flex;align-items:center;justify-content:center;padding:7px 14px;border-radius:5px;border:none;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:700;transition:all .2s;gap:5px}
 .btn-r{background:rgba(255,34,68,.12);color:var(--red);border:1px solid rgba(255,34,68,.25)}
 .btn-r:hover{background:rgba(255,34,68,.22)}
@@ -79,7 +82,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">⚡ ADMIN</div>
-    <div class="login-sub">// СКУЛДРОП v5 ПАНЕЛЬ</div>
+    <div class="login-sub">// СКУЛДРОП v6 ПАНЕЛЬ</div>
     <div class="field"><label>СЕКРЕТНЫЙ ПАРОЛЬ</label>
       <input class="inp" type="password" id="login-pass" placeholder="введи пароль" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
@@ -89,7 +92,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 <div id="admin-screen">
   <div class="admin-header">
-    <div class="admin-logo">⚡ SKOLODROP ADMIN v5</div>
+    <div class="admin-logo">⚡ SKOLODROP ADMIN v6</div>
     <button class="btn btn-o" onclick="doLogout()">выйти</button>
   </div>
 
@@ -98,6 +101,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="stat-card" onclick="switchTab('orders')"><div class="stat-val s-c" id="st-open">–</div><div class="stat-lbl">ОТКРЫТЫХ</div></div>
     <div class="stat-card" onclick="switchTab('orders')"><div class="stat-val s-o" id="st-taken">–</div><div class="stat-lbl">В РАБОТЕ</div></div>
     <div class="stat-card" onclick="switchTab('orders')"><div class="stat-val s-g" id="st-done">–</div><div class="stat-lbl">ВЫПОЛНЕНО</div></div>
+    <div class="stat-card" onclick="switchTab('posts')"><div class="stat-val s-p" id="st-posts">–</div><div class="stat-lbl">ПОСТОВ</div></div>
     <div class="stat-card" onclick="switchTab('reports')"><div class="stat-val s-r" id="st-reports">–</div><div class="stat-lbl">ЖАЛОБ</div></div>
     <div class="stat-card" onclick="switchTab('schools')"><div class="stat-val s-p" id="st-schools">–</div><div class="stat-lbl">ШКОЛ</div></div>
     <div class="stat-card" onclick="switchTab('schools')"><div class="stat-val s-g" id="st-users">–</div><div class="stat-lbl">ПОЛЬЗОВАТЕЛЕЙ</div></div>
@@ -106,6 +110,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
   <div class="tabs">
     <div class="tab" onclick="switchTab('schools')">🏫 Школы</div>
+    <div class="tab" onclick="switchTab('posts')">📱 Посты</div>
     <div class="tab" onclick="switchTab('orders')">📋 Заказы</div>
     <div class="tab" onclick="switchTab('reports')">🚩 Жалобы</div>
     <div class="tab" onclick="switchTab('ban')">⛔ Бан</div>
@@ -121,7 +126,7 @@ const WORKER_URL = 'https://healthy-kingfisher-53.mirrorrrr.deno.net';
 const SUPABASE_URL = 'https://isognckwqrwkmgkzigqh.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlzb2duY2t3cXJ3a21na3ppZ3FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NzcxODYsImV4cCI6MjA4OTI1MzE4Nn0.UlkdlXVP1V8dD7DehXTqOEtuIN2yyZjDhGM9S4DoPgI'; 
 let adminToken = sessionStorage.getItem('admin_token')||'';
-let currentTab = 'withdrawals';
+let currentTab = 'schools';
 
 if(adminToken) showAdmin();
 
@@ -162,6 +167,7 @@ async function loadStats(){
     document.getElementById('st-open').textContent=s.orders.open;
     document.getElementById('st-taken').textContent=s.orders.taken;
     document.getElementById('st-done').textContent=s.orders.done;
+    document.getElementById('st-posts').textContent=s.posts;
     document.getElementById('st-reports').textContent=s.reports.unresolved+' новых';
     document.getElementById('st-schools').textContent=s.schools.length;
     document.getElementById('st-users').textContent=s.total_users;
@@ -178,7 +184,7 @@ async function loadOnlineCount(){
 function switchTab(tab){
   currentTab=tab;
   document.querySelectorAll('.tab').forEach((t,i)=>{
-    const tabs=['schools','orders','reports','ban','ban'];
+    const tabs=['schools','posts','orders','reports','ban'];
     t.classList.toggle('on',tabs[i]===tab);
   });
   loadTab(tab);
@@ -187,11 +193,13 @@ async function loadTab(tab){
   const c=document.getElementById('admin-content');
   c.innerHTML=`<div class="loader"><span class="spin">⟳</span> загрузка...</div>`;
   if(tab==='schools') await renderSchools(c);
+  if(tab==='posts') await renderPosts(c);
   if(tab==='orders') await renderOrders(c);
   if(tab==='reports') await renderReports(c);
   if(tab==='ban') renderBan(c);
 }
 
+// Школы
 async function renderSchools(c){
   try{
     const s=await adminApi('GET','/api/admin/stats');
@@ -214,6 +222,39 @@ async function renderSchools(c){
   }catch(e){c.innerHTML=`<div class="empty">❌ ${esc(e.message)}</div>`;}
 }
 
+// ПОСТЫ (новый раздел)
+async function renderPosts(c){
+  try{
+    const posts=await adminApi('GET','/api/admin/posts');
+    if(!posts.length){c.innerHTML='<div class="empty">Постов нет</div>';return;}
+    c.innerHTML=`<div class="sec-title">// ВСЕ ПОСТЫ (${posts.length})</div>`+
+      posts.map(p=>`
+        <div class="post-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:12px;color:var(--cyan);font-weight:700">${esc(p.author_nick)}</span>
+            <span style="font-size:10px;color:var(--text2)">${timeAgo(p.created_at)}</span>
+          </div>
+          <div class="post-content">${esc(p.content)}</div>
+          ${p.media_url ? `<img class="post-media" src="${esc(p.media_url)}" onerror="this.style.display='none'">` : ''}
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+            <span style="font-size:11px;color:var(--yellow)">❤️ ${p.likes_count || 0}</span>
+            <span style="font-size:11px;color:var(--cyan)">💬 ${p.comments_count || 0}</span>
+            <button class="btn btn-r btn-sm" onclick="deletePost('${p.id}')">🗑 Удалить</button>
+          </div>
+        </div>`).join('');
+  }catch(e){c.innerHTML=`<div class="empty">❌ ${esc(e.message)}</div>`;}
+}
+
+async function deletePost(id){
+  if(!confirm('Удалить пост?')) return;
+  try{
+    await adminApi('DELETE','/api/admin/posts',{id});
+    toast('✅ Пост удален');
+    loadStats();
+    renderPosts(document.getElementById('admin-content'));
+  }catch(e){toast('❌ '+e.message);}
+}
+
 async function viewSchoolUsers(schoolId,schoolName){
   const c=document.getElementById('admin-content');
   c.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
@@ -223,7 +264,6 @@ async function viewSchoolUsers(schoolId,schoolName){
   <div class="loader"><span class="spin">⟳</span> загрузка...</div>`;
 
   try{
-    // 👇 получаем список учеников через админский API
     const users = await adminApi('GET', `/api/admin/school-users?school_id=${schoolId}`);
     
     if(!users || !users.length){
@@ -302,7 +342,7 @@ async function renderOrders(c){
             <div class="row-title">${esc(o.title)}</div>
             <div class="row-meta">
               <span class="badge ${o.status==='open'?'b-open':o.status==='taken'?'b-taken':'b-done'}">${o.status}</span>
-              &nbsp;${esc(o.author_nick)} · ${esc(o.amount)} ${esc(o.currency)} · ${o.school_name?'🏫 '+esc(o.school_name)+' · ':''} ${timeAgo(o.created_at)}
+              &nbsp;${esc(o.author_nick)} · ${esc(o.amount)} ₽ · ${o.school_name?'🏫 '+esc(o.school_name)+' · ':''} ${timeAgo(o.created_at)}
             </div>
           </div>
           <div class="row-actions">

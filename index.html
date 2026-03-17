@@ -184,7 +184,7 @@ select.inp{appearance:none;cursor:pointer}
 <body>
 <div class="wrap">
 <header>
-  <div class="logo">СКУЛДРОП<sub>v5</sub></div>
+  <div class="logo">СКУЛДРОП<sub>v6</sub></div>
   <div class="hdr-r">
     <div class="online-count" style="display:flex;align-items:center;gap:4px;margin-right:8px;font-size:10px;color:var(--green)">👥 <span id="online-count-header">0</span></div>
     <button class="nick-btn" onclick="showScreen('profile')">
@@ -205,7 +205,7 @@ select.inp{appearance:none;cursor:pointer}
     <!-- REGISTER -->
     <div id="auth-reg">
       <div style="font-size:11px;color:var(--text2);line-height:1.8;margin-bottom:16px;background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:10px">
-        🏫 <b style="color:var(--cyan)">Соцсеть</b> — чат школы, общение<br>
+        🏫 <b style="color:var(--cyan)">Соцсеть</b> — посты, лайки, чат школы<br>
         💼 <b style="color:var(--green)">Маркетплейс</b> — заказы, оплата наличными
       </div>
       <div class="field"><label>ПСЕВДОНИМ <span style="color:var(--red)">*</span></label>
@@ -254,8 +254,8 @@ select.inp{appearance:none;cursor:pointer}
 <!-- MAIN -->
 <div id="main" style="display:none;flex:1">
 
-  <!-- FEED -->
-  <div class="screen active" id="screen-feed">
+  <!-- FEED (ЗАКАЗЫ) -->
+  <div class="screen" id="screen-feed">
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
       <input class="inp search-inp" id="search-inp" placeholder="поиск заказов..." oninput="onSearch()">
@@ -273,10 +273,22 @@ select.inp{appearance:none;cursor:pointer}
       <div class="cat-pill" data-cat="task">⚡ Поручения</div>
     </div>
     <div class="sec-head">
-      <span class="sec-title">// ЛЕНТА</span>
+      <span class="sec-title">// ЛЕНТА ЗАКАЗОВ</span>
       <span class="sec-sub"><div class="dot dot-g"></div><span id="feed-cnt" style="font-size:10px;color:var(--green)">загрузка...</span></span>
     </div>
     <div id="feed-list"></div>
+  </div>
+
+  <!-- POSTS (НОВЫЙ ЭКРАН - ПОСТЫ) -->
+  <div class="screen" id="screen-posts">
+    <div class="sec-head">
+      <span class="sec-title">// ЛЕНТА ПОСТОВ</span>
+      <span class="sec-sub">
+        <span style="font-size:10px;color:var(--green)" id="posts-count">0</span>
+        <button class="btn btn-sm btn-g" onclick="openCreatePost()" style="padding:2px 8px;font-size:9px">+ НОВЫЙ</button>
+      </span>
+    </div>
+    <div id="posts-list"></div>
   </div>
 
   <!-- SCHOOL -->
@@ -362,9 +374,6 @@ select.inp{appearance:none;cursor:pointer}
     </div>
   </div>
 
-  <!-- WALLET - removed, cash only -->
-  <div class="screen" id="screen-wallet" style="display:none"></div>
-
   <!-- PROFILE -->
   <div class="screen" id="screen-profile">
     <div class="prof-header">
@@ -376,7 +385,9 @@ select.inp{appearance:none;cursor:pointer}
         <div style="font-size:11px;color:var(--text2)" id="prof-rcount-d"></div>
       </div>
     </div>
-<div class="gap"></div>
+    
+    <div class="sec-head"><span class="sec-title">// МОИ ПОСТЫ</span></div>
+    <div id="profile-posts-list" style="margin-bottom:16px"></div>
     
     <div class="sec-head"><span class="sec-title">// СМЕНИТЬ ПАРОЛЬ</span></div>
     <div class="field"><label>ТЕКУЩИЙ ПАРОЛЬ</label>
@@ -393,7 +404,8 @@ select.inp{appearance:none;cursor:pointer}
 </div>
 
 <nav id="nav" style="display:none">
-  <button class="nb active" id="nb-feed" onclick="showScreen('feed')"><span class="nb-icon">📡</span>лента</button>
+  <button class="nb" id="nb-feed" onclick="showScreen('feed')"><span class="nb-icon">📦</span>заказы</button>
+  <button class="nb" id="nb-posts" onclick="showScreen('posts')"><span class="nb-icon">📱</span>посты</button>
   <button class="nb" id="nb-school" onclick="showScreen('school')"><span class="nb-icon">🏫</span>школа</button>
   <button class="nb-plus" onclick="showScreen('post')"><div class="plus-ring">+</div><span>заказ</span></button>
   <button class="nb" id="nb-my" onclick="showScreen('my')"><span class="nb-icon">📋</span>мои</button>
@@ -407,6 +419,25 @@ select.inp{appearance:none;cursor:pointer}
 <div class="modal-bg" id="modal-rate"><div class="modal"><div class="modal-handle"></div><div class="modal-title">⭐ ОЦЕНИТЬ</div><div style="text-align:center;margin-bottom:16px"><div class="stars" id="rate-stars"><span class="star" data-v="1" onclick="setStar(1)">★</span><span class="star" data-v="2" onclick="setStar(2)">★</span><span class="star" data-v="3" onclick="setStar(3)">★</span><span class="star" data-v="4" onclick="setStar(4)">★</span><span class="star" data-v="5" onclick="setStar(5)">★</span></div><div style="font-size:11px;color:var(--text2)" id="star-label">выбери оценку</div></div><div class="field"><label>КОММЕНТАРИЙ</label><textarea class="inp" id="rate-comment" style="min-height:60px" maxlength="200"></textarea></div><button class="btn btn-g btn-full" onclick="submitRating()">✅ ОТПРАВИТЬ</button><div class="gap"></div><button class="btn btn-o btn-full btn-sm" onclick="closeModal('modal-rate')">Отмена</button></div></div>
 <div class="modal-bg" id="modal-report"><div class="modal"><div class="modal-handle"></div><div class="modal-title">🚩 ЖАЛОБА</div><div class="field"><label>ПРИЧИНА</label><textarea class="inp" id="report-reason" style="min-height:80px" maxlength="300"></textarea></div><button class="btn btn-r btn-full" onclick="submitReport()">🚩 ОТПРАВИТЬ</button><div class="gap"></div><button class="btn btn-o btn-full btn-sm" onclick="closeModal('modal-report')">Отмена</button></div></div>
 <div class="modal-bg" id="modal-agreement"><div class="modal"><div class="modal-handle"></div><div class="modal-title">📋 ПОЛЬЗОВАТЕЛЬСКОЕ СОГЛАШЕНИЕ</div><div style="font-size:11px;color:var(--text2);line-height:1.9;max-height:55vh;overflow-y:auto;padding-right:4px"><b style="color:var(--text)">1. ПЛАТФОРМА</b><br>СКУЛДРОП — информационная платформа (соцсеть + маркетплейс). Администрация не является стороной сделок между пользователями.<br><br><b style="color:var(--text)">2. ОТВЕТСТВЕННОСТЬ</b><br>Администрация <b style="color:var(--red)">не несёт ответственности</b> за качество выполнения заказов, споры между пользователями, невыполнение обязательств и убытки.<br><br><b style="color:var(--text)">3. КОМИССИЯ</b><br>Комиссия: <b style="color:var(--green)">0%</b>. Все расчёты наличными напрямую между пользователями.<br><br><b style="color:var(--text)">4. ЗАПРЕЩЕНО</b><br>Незаконные заказы, оружие, наркотики, угрозы, оскорбления.<br><br><b style="color:var(--text)">5. БЛОКИРОВКА</b><br>Администрация вправе заблокировать нарушителей без объяснений.<br><br><b style="color:var(--text)">6. КОНФИДЕНЦИАЛЬНОСТЬ</b><br>Персональные данные не собираются. Пароль хранится в виде SHA-256 хэша.<br><br><b style="color:var(--red)">Регистрируясь вы принимаете все условия соглашения.</b></div><div class="gap"></div><button class="btn btn-g btn-full" onclick="closeModal('modal-agreement');['setup-agree','agree-check'].forEach(id=>{const el=document.getElementById(id);if(el)el.checked=true})">✅ ПРИНИМАЮ</button><div class="gap"></div><button class="btn btn-o btn-full btn-sm" onclick="closeModal('modal-agreement')">Закрыть</button></div></div>
+
+<!-- НОВЫЕ МОДАЛКИ ДЛЯ ПОСТОВ -->
+<div class="modal-bg" id="modal-create-post"><div class="modal"><div class="modal-handle"></div><div class="modal-title">📝 НОВЫЙ ПОСТ</div>
+  <div class="field"><label>ТЕКСТ ПОСТА</label>
+    <textarea class="inp" id="post-content" placeholder="Что у тебя нового?" style="min-height:100px" maxlength="2000"></textarea>
+  </div>
+  <div class="field"><label>МЕДИА (необязательно)</label>
+    <input type="file" class="inp" id="post-media" accept="image/*" style="padding:8px">
+  </div>
+  <button class="btn btn-g btn-full" onclick="createPost()">📱 ОПУБЛИКОВАТЬ</button>
+  <div class="gap"></div>
+  <button class="btn btn-o btn-full btn-sm" onclick="closeModal('modal-create-post')">Отмена</button>
+</div></div>
+
+<div class="modal-bg" id="modal-view-post"><div class="modal"><div class="modal-handle"></div>
+  <div id="view-post-content"></div>
+  <div class="gap"></div>
+  <button class="btn btn-o btn-full btn-sm" onclick="closeModal('modal-view-post')">Закрыть</button>
+</div></div>
 
 <div id="toast"></div>
 
@@ -424,6 +455,11 @@ let myTaken=[], currentCat='all', myTab='posted', feedScope='my';
 let rateOrderId=null, reportOrderId=null, orderChatId=null, selectedStar=0;
 let searchQuery='', allOrders=[], schoolChatTimer=null, selectedSchoolId=null;
 let lastOrderCount = 0;
+
+// Новые переменные для постов
+let currentPosts = [];
+let currentPostPage = 1;
+let hasMorePosts = true;
 
 function loadLocal(){
   try{
@@ -604,10 +640,11 @@ function enterApp(){
   document.getElementById('main').style.display='block';
   document.getElementById('nav').style.display='flex';
   document.getElementById('hdr-nick').textContent=P.nick;
-  showScreen('feed');
+  showScreen('posts'); // По умолчанию показываем посты
   renderProfile();
   loadOnlineCount();
   loadSchoolOnline();
+  loadPosts(); // Загружаем посты при входе
 }
 function logout(){
   if(!confirm('Выйти из аккаунта?'))return;
@@ -618,7 +655,7 @@ function logout(){
 function updateBalanceUI(){saveLocal();}
 async function syncBalance(){}
 
-const SCREENS=['feed','school','my','post','profile'];
+const SCREENS=['feed','posts','school','my','post','profile'];
 function showScreen(name){
   SCREENS.forEach(s=>{
     document.getElementById('screen-'+s)?.classList.remove('active');
@@ -628,6 +665,7 @@ function showScreen(name){
   document.getElementById('nb-'+name)?.classList.add('active');
   clearInterval(schoolChatTimer);
   if(name==='feed')loadFeed();
+  if(name==='posts'){loadPosts();}
   if(name==='school'){loadSchoolScreen();schoolChatTimer=setInterval(loadSchoolMessages,5000);}
   if(name==='my')loadMy();
   if(name==='post')renderPost();
@@ -674,7 +712,7 @@ async function sendSchoolMsg(){
   }catch(e){toast('❌ '+e.message);}
 }
 
-// ── FEED ──────────────────────────────────────────────
+// ── FEED (ЗАКАЗЫ) ─────────────────────────────────────
 function setScope(scope){
   feedScope=scope;
   document.getElementById('scope-my').className=scope==='my'?'btn btn-sm':'btn btn-sm btn-o';
@@ -931,8 +969,207 @@ async function submitReport(){
   catch(e){toast('❌ '+e.message);}
 }
 
+// ── НОВЫЙ РАЗДЕЛ: ПОСТЫ И ЛАЙКИ ─────────────────────────────────────
+
+// Создание поста
+function openCreatePost(){
+  document.getElementById('post-content').value = '';
+  document.getElementById('post-media').value = '';
+  openModal('modal-create-post');
+}
+
+async function createPost(){
+  const content = document.getElementById('post-content').value.trim();
+  const mediaFile = document.getElementById('post-media').files[0];
+  
+  if(!content){toast('⚠️ Введи текст поста');return;}
+  if(!rl('post',10,3600000)){toast('⛔ Слишком много постов');return;}
+
+  let media_url = '';
+  if(mediaFile){
+    media_url = await new Promise(res=>{
+      const r=new FileReader();
+      r.onload=e=>res(e.target.result);
+      r.readAsDataURL(mediaFile);
+    });
+  }
+
+  try{
+    await api('POST','/api/posts',{
+      nick: P.nick,
+      content,
+      media_url,
+      schoolId: P.schoolId
+    });
+    closeModal('modal-create-post');
+    toast('✅ Пост опубликован!');
+    loadPosts();
+    loadProfile(); // Обновляем посты в профиле
+  }catch(e){toast('❌ '+e.message);}
+}
+
+// Загрузка ленты постов
+async function loadPosts(reset = true){
+  if(reset){
+    currentPostPage = 1;
+    hasMorePosts = true;
+  }
+  
+  const list = document.getElementById('posts-list');
+  if(reset) list.innerHTML = `<div class="loader"><div class="spin">⟳</div><div>загрузка...</div></div>`;
+
+  if(!DB_OK) return;
+  
+  try{
+    const {data} = await sb.from('posts')
+      .select('*')
+      .eq('school_id', P.schoolId)
+      .order('created_at', {ascending: false})
+      .range((currentPostPage-1)*20, currentPostPage*20 - 1);
+    
+    if(!data?.length){
+      if(reset){
+        list.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Пока нет постов.<br>Будь первым!</div></div>`;
+      }
+      document.getElementById('posts-count').textContent = data?.length || 0;
+      return;
+    }
+    
+    if(reset){
+      currentPosts = data;
+    } else {
+      currentPosts = [...currentPosts, ...data];
+    }
+    
+    document.getElementById('posts-count').textContent = currentPosts.length;
+    renderPostsList();
+    
+    // Проверяем, есть ли еще посты
+    if(data.length < 20) hasMorePosts = false;
+  } catch(e){
+    list.innerHTML = `<div class="empty"><div class="empty-icon">❌</div><div class="empty-text">${esc(e.message)}</div></div>`;
+  }
+}
+
+// Рендер списка постов
+function renderPostsList(){
+  const list = document.getElementById('posts-list');
+  list.innerHTML = currentPosts.map(post => postCard(post)).join('');
+}
+
+// Карточка поста
+function postCard(p){
+  const liked = p.liked_by?.includes(P.nick) || false;
+  const mediaHtml = p.media_url ? `<img class="card-img" src="${esc(p.media_url)}" style="margin-bottom:10px;max-height:250px;" onerror="this.style.display='none'">` : '';
+  
+  return `
+    <div class="order-card" style="margin-bottom:16px;" onclick="openPostModal('${p.id}')">
+      <div class="card-top">
+        <span class="card-meta">${esc(p.author_nick)} · ${timeAgo(p.created_at)}</span>
+      </div>
+      <div class="card-title">${esc(p.content).slice(0, 150)}${p.content.length > 150 ? '...' : ''}</div>
+      ${mediaHtml}
+      <div class="card-bottom">
+        <span class="card-meta" style="color:var(--yellow)">❤️ ${p.likes || 0}</span>
+        <span class="card-meta">💬 ${p.comments || 0}</span>
+      </div>
+    </div>
+  `;
+}
+
+// Открыть пост в модалке
+async function openPostModal(postId){
+  const {data} = await sb.from('posts').select('*').eq('id', postId).single();
+  if(!data) return;
+  
+  const liked = data.liked_by?.includes(P.nick) || false;
+  const mediaHtml = data.media_url ? `<img class="card-img" src="${esc(data.media_url)}" style="margin-bottom:12px;" onerror="this.style.display='none'">` : '';
+  
+  const isAuthor = data.author_nick === P.nick;
+  const deleteBtn = isAuthor ? `<button class="btn btn-r btn-sm" onclick="deletePost('${data.id}')">🗑️ Удалить</button>` : '';
+  
+  document.getElementById('view-post-content').innerHTML = `
+    <div class="modal-title" style="margin-bottom:8px;">📝 Пост</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <span class="card-meta">👤 ${esc(data.author_nick)} · ${timeAgo(data.created_at)}</span>
+      ${deleteBtn}
+    </div>
+    <div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:12px;">${esc(data.content)}</div>
+    ${mediaHtml}
+    <div style="display:flex;gap:16px;margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
+      <button class="btn btn-sm ${liked ? 'btn-g' : 'btn-o'}" onclick="likePost('${data.id}', ${!liked})" style="flex:1">
+        ❤️ ${data.likes || 0} ${liked ? ' (Вам нравится)' : ''}
+      </button>
+    </div>
+  `;
+  openModal('modal-view-post');
+}
+
+// Лайк поста
+async function likePost(postId, like){
+  try{
+    await api('POST', '/api/posts/like', {
+      post_id: postId,
+      nick: P.nick,
+      like: like
+    });
+    toast(like ? '❤️ Лайк поставлен' : '💔 Лайк убран');
+    loadPosts(true);
+    closeModal('modal-view-post');
+  } catch(e){
+    toast('❌ ' + e.message);
+  }
+}
+
+// Удаление поста
+async function deletePost(postId){
+  if(!confirm('Удалить пост?')) return;
+  try{
+    await api('DELETE', '/api/posts', { id: postId, nick: P.nick });
+    toast('✅ Пост удален');
+    loadPosts(true);
+    loadProfile();
+    closeModal('modal-view-post');
+  } catch(e){
+    toast('❌ ' + e.message);
+  }
+}
+
+// Загрузка постов в профиле
+async function loadProfilePosts(){
+  const list = document.getElementById('profile-posts-list');
+  list.innerHTML = `<div class="loader"><div class="spin">⟳</div></div>`;
+  
+  try{
+    const {data} = await sb.from('posts')
+      .select('*')
+      .eq('author_nick', P.nick)
+      .order('created_at', {ascending: false})
+      .limit(5);
+    
+    if(!data?.length){
+      list.innerHTML = `<div class="empty-text" style="padding:12px;font-size:11px;">У тебя пока нет постов</div>`;
+      return;
+    }
+    
+    list.innerHTML = data.map(p => `
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer;" onclick="openPostModal('${p.id}')">
+        <div style="font-size:12px;">${esc(p.content).slice(0,80)}${p.content.length>80?'...':''}</div>
+        <div style="display:flex;gap:12px;margin-top:6px;font-size:10px;color:var(--text2);">
+          <span>❤️ ${p.likes || 0}</span>
+          <span>${timeAgo(p.created_at)}</span>
+        </div>
+      </div>
+    `).join('');
+  } catch(e){
+    list.innerHTML = `<div class="empty-text">❌ Ошибка загрузки</div>`;
+  }
+}
+
+// ── PROFILE ─────────────────────────────────────
 async function loadProfile(){
   renderProfile();
+  loadProfilePosts();
   if(!DB_OK)return;
   try{
     const{data:rats}=await sb.from('ratings').select('score').eq('to_nick',P.nick);
@@ -975,6 +1212,14 @@ let toastT;
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2800);}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function timeAgo(ts){const d=Date.now()-new Date(ts).getTime();if(d<60000)return 'только что';if(d<3600000)return Math.floor(d/60000)+'м назад';if(d<86400000)return Math.floor(d/3600000)+'ч назад';return Math.floor(d/86400000)+'д назад';}
+
+// Добавляем бесконечную прокрутку для постов
+window.addEventListener('scroll', () => {
+  if(hasMorePosts && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500){
+    currentPostPage++;
+    loadPosts(false);
+  }
+});
 
 loadLocal();
 if(P.nick)enterApp();
