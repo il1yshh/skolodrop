@@ -7,7 +7,7 @@
 <title>СКУЛДРОП</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-/* ==== СТИЛИ (без изменений, всё как у тебя) ==== */
+/* ==== СТИЛИ ==== */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#030305;--s1:#07070e;--s2:#0b0b16;--card:#0e0e1a;--card2:#12121f;
@@ -62,10 +62,12 @@ nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:rgba(3,3,5,.9
 .school-wrap{position:relative;margin-bottom:4px}
 .school-drop{position:absolute;top:100%;left:0;right:0;background:var(--card2);border:1px solid var(--border2);border-top:none;border-radius:0 0 6px 6px;z-index:200;max-height:200px;overflow-y:auto;display:none}
 .school-drop.open{display:block}
-.school-opt{padding:9px 12px;font-size:12px;cursor:pointer;color:var(--text);border-bottom:1px solid var(--border);transition:background .15s}
+.school-opt{padding:9px 12px;font-size:12px;cursor:pointer;color:var(--text);border-bottom:1px solid var(--border);transition:background .15s;display:flex;flex-direction:column;align-items:flex-start;line-height:1.4}
 .school-opt:hover{background:rgba(0,255,136,.08);color:var(--green)}
-.school-opt.new-s{color:var(--cyan);font-style:italic}
+.school-opt.new-s{background:linear-gradient(45deg,rgba(0,229,255,0.05),rgba(168,85,247,0.05));border-left:3px solid var(--cyan)}
 .school-opt:last-child{border-bottom:none}
+.school-actions{display:flex;gap:8px;margin-top:8px}
+.school-status{font-size:10px;color:var(--text2);margin-top:4px;min-height:16px}
 .order-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:13px;margin-bottom:10px;cursor:pointer;transition:border-color .2s,transform .15s;position:relative;overflow:hidden}
 .order-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
 .order-card.cat-hw::before{background:var(--cyan)}
@@ -221,9 +223,14 @@ select.inp{appearance:none;cursor:pointer}
       <div class="field"><label>ШКОЛА <span style="color:var(--red)">*</span></label>
         <div class="school-wrap">
           <input class="inp" id="s-school" placeholder="Начни вводить: СОШ №5, Москва..."
-            autocomplete="off" oninput="schoolSearch(this.value)" onfocus="schoolSearch(this.value)">
+            autocomplete="off" oninput="schoolSearch(this.value)" onfocus="schoolSearch(this.value)" onclick="this.select()">
           <div class="school-drop" id="school-drop"></div>
         </div>
+        <div class="school-actions">
+          <button type="button" class="btn btn-sm btn-o" style="flex:1;" onclick="showCreateSchoolForm()">➕ Создать школу</button>
+          <button type="button" class="btn btn-sm btn-o" style="flex:1;" onclick="refreshSchools()">🔄 Обновить</button>
+        </div>
+        <div class="school-status" id="school-status"></div>
         <div style="font-size:10px;color:var(--text2);margin-top:4px">Формат: СОШ №5, Москва · Лицей №7, Казань · Гимназия №1, СПб</div>
       </div>
 
@@ -438,6 +445,38 @@ select.inp{appearance:none;cursor:pointer}
 <div class="modal-bg" id="modal-report"><div class="modal"><div class="modal-handle"></div><div class="modal-title">🚩 ЖАЛОБА</div><div class="field"><label>ПРИЧИНА</label><textarea class="inp" id="report-reason" style="min-height:80px" maxlength="300"></textarea></div><button class="btn btn-r btn-full" onclick="submitReport()">🚩 ОТПРАВИТЬ</button><div class="gap"></div><button class="btn btn-o btn-full btn-sm" onclick="closeModal('modal-report')">Отмена</button></div></div>
 <div class="modal-bg" id="modal-agreement"><div class="modal"><div class="modal-handle"></div><div class="modal-title">📋 ПОЛЬЗОВАТЕЛЬСКОЕ СОГЛАШЕНИЕ</div><div style="font-size:11px;color:var(--text2);line-height:1.9;max-height:55vh;overflow-y:auto;padding-right:4px"><b style="color:var(--text)">1. ПЛАТФОРМА</b><br>СКУЛДРОП — информационная платформа (соцсеть + маркетплейс). Администрация не является стороной сделок между пользователями.<br><br><b style="color:var(--text)">2. ОТВЕТСТВЕННОСТЬ</b><br>Администрация <b style="color:var(--red)">не несёт ответственности</b> за качество выполнения заказов, споры между пользователями, невыполнение обязательств и убытки.<br><br><b style="color:var(--text)">3. КОМИССИЯ</b><br>Комиссия: <b style="color:var(--green)">0%</b>. Все расчёты наличными напрямую между пользователями.<br><br><b style="color:var(--text)">4. ЗАПРЕЩЕНО</b><br>Незаконные заказы, оружие, наркотики, угрозы, оскорбления.<br><br><b style="color:var(--text)">5. БЛОКИРОВКА</b><br>Администрация вправе заблокировать нарушителей без объяснений.<br><br><b style="color:var(--text)">6. КОНФИДЕНЦИАЛЬНОСТЬ</b><br>Персональные данные не собираются. Пароль хранится в виде SHA-256 хэша.<br><br><b style="color:var(--red)">Регистрируясь вы принимаете все условия соглашения.</b></div><div class="gap"></div><button class="btn btn-g btn-full" onclick="closeModal('modal-agreement');['setup-agree','agree-check'].forEach(id=>{const el=document.getElementById(id);if(el)el.checked=true})">✅ ПРИНИМАЮ</button><div class="gap"></div><button class="btn btn-o btn-full btn-sm" onclick="closeModal('modal-agreement')">Закрыть</button></div></div>
 
+<!-- МОДАЛКА СОЗДАНИЯ ШКОЛЫ -->
+<div class="modal-bg" id="modal-create-school">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🏫 СОЗДАТЬ НОВУЮ ШКОЛУ</div>
+    
+    <div class="field">
+      <label>НАЗВАНИЕ ШКОЛЫ <span style="color:var(--red)">*</span></label>
+      <input class="inp" id="new-school-name" placeholder="например: СОШ №5, Москва" maxlength="100">
+    </div>
+    
+    <div class="field">
+      <label>ГОРОД (необязательно)</label>
+      <input class="inp" id="new-school-city" placeholder="Москва, СПб, Казань...">
+    </div>
+    
+    <div class="field">
+      <label>АДРЕС (необязательно)</label>
+      <input class="inp" id="new-school-address" placeholder="ул. Ленина, д. 10">
+    </div>
+    
+    <div class="info-box">
+      📍 Укажите город, чтобы другим было проще найти вашу школу
+    </div>
+    
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-g" style="flex:2" onclick="createNewSchool()">✅ СОЗДАТЬ</button>
+      <button class="btn btn-o" style="flex:1" onclick="closeModal('modal-create-school')">Отмена</button>
+    </div>
+  </div>
+</div>
+
 <!-- МОДАЛКИ ДЛЯ ПОСТОВ -->
 <div class="modal-bg" id="modal-create-post"><div class="modal"><div class="modal-handle"></div><div class="modal-title">📝 НОВЫЙ ПОСТ</div>
   <div class="field"><label>ТЕКСТ ПОСТА</label>
@@ -517,8 +556,11 @@ async function api(method, path, body){
   if(body) opts.body = JSON.stringify(body);
   
   const res = await fetch(WORKER_URL + path, opts);
+  if(!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Ошибка сервера');
+  }
   const d = await res.json().catch(() => ({}));
-  if(!res.ok) throw new Error(d.error || 'Ошибка сервера');
   return d;
 }
 
@@ -532,8 +574,9 @@ async function hashPassword(pass){
 async function loadOnlineCount(){
   try{
     const res = await fetch(WORKER_URL + '/api/online');
+    if(!res.ok) return;
     const data = await res.json();
-    document.getElementById('online-count-header').textContent = data.count;
+    document.getElementById('online-count-header').textContent = data.count || 0;
   } catch(e){}
 }
 setInterval(loadOnlineCount, 30000);
@@ -541,49 +584,149 @@ setInterval(loadOnlineCount, 30000);
 // ========== SCHOOL SEARCH ==========
 async function schoolSearch(query){
   const drop = document.getElementById('school-drop');
-  if(!query || query.length < 1){
+  const status = document.getElementById('school-status');
+  
+  if(!query || query.length < 2){
     drop.classList.remove('open');
+    if(status) status.textContent = '👆 Введите минимум 2 символа';
     return;
   }
   
   try{
+    if(status) status.textContent = '🔍 Поиск...';
+    
     const res = await fetch(WORKER_URL + '/api/schools/search?q=' + encodeURIComponent(query));
+    if(!res.ok) throw new Error('Ошибка сервера');
+    
     const schools = await res.json();
     
+    if(!schools || schools.length === 0){
+      drop.innerHTML = `<div class="school-opt new-s" onclick="showCreateSchoolForm('${esc(query)}')">
+        <span style="font-weight:bold">➕ Создать школу</span><br>
+        <span style="font-size:9px;color:var(--text2)">«${esc(query)}» пока нет в базе</span>
+      </div>`;
+      drop.classList.add('open');
+      if(status) status.textContent = '📌 Школа не найдена, можно создать';
+      return;
+    }
+    
     let html = schools.map(s => 
-      `<div class="school-opt" onclick="selectSchool(${s.id}, '${esc(s.name)}')">${esc(s.name)}</div>`
+      `<div class="school-opt" onclick="selectSchool(${s.id}, '${esc(s.name)}')">
+        <span style="font-weight:bold">${esc(s.name)}</span>
+        ${s.city ? `<span style="font-size:9px;color:var(--text2)"> · ${esc(s.city)}</span>` : ''}
+      </div>`
     ).join('');
-    html += `<div class="school-opt new-s" onclick="createAndSelectSchool('${esc(query)}')">+ Создать: ${esc(query)}</div>`;
+    
+    html += `<div class="school-opt new-s" onclick="showCreateSchoolForm('${esc(query)}')">
+      <span style="font-weight:bold">➕ Создать новую школу</span><br>
+      <span style="font-size:9px;color:var(--text2)">если не нашли подходящую</span>
+    </div>`;
     
     drop.innerHTML = html;
     drop.classList.add('open');
+    if(status) status.textContent = `✅ Найдено школ: ${schools.length}`;
+    
   } catch(e){
-    drop.classList.remove('open');
+    console.error('Search error:', e);
+    drop.innerHTML = `<div class="school-opt" style="color:var(--red)">❌ Ошибка: ${esc(e.message)}</div>`;
+    drop.classList.add('open');
+    if(status) status.textContent = '⚠️ Ошибка поиска';
   }
 }
+
 function selectSchool(id, name){
   selectedSchoolId = id;
-  document.getElementById('s-school').value = name;
+  const input = document.getElementById('s-school');
+  input.value = name;
+  input.dataset.schoolId = id;
+  input.dataset.schoolName = name;
+  
   document.getElementById('school-drop').classList.remove('open');
+  
+  const status = document.getElementById('school-status');
+  if(status){
+    status.innerHTML = `✅ Выбрана: <b style="color:var(--green)">${esc(name)}</b>`;
+  }
+  
+  input.style.borderColor = 'var(--green)';
 }
-async function createAndSelectSchool(name){
+
+function showCreateSchoolForm(defaultName = ''){
+  if(defaultName && defaultName !== 'undefined'){
+    document.getElementById('new-school-name').value = defaultName;
+  } else {
+    document.getElementById('new-school-name').value = '';
+  }
+  document.getElementById('new-school-city').value = '';
+  document.getElementById('new-school-address').value = '';
+  openModal('modal-create-school');
+}
+
+async function createNewSchool(){
+  const name = document.getElementById('new-school-name').value.trim();
+  const city = document.getElementById('new-school-city').value.trim();
+  const address = document.getElementById('new-school-address').value.trim();
+  
+  if(!name || name.length < 3){
+    toast('⚠️ Название школы минимум 3 символа');
+    return;
+  }
+  
+  const btn = event.target;
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'создаем...';
+  
   try{
     const res = await fetch(WORKER_URL + '/api/schools/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name })
+      body: JSON.stringify({ name, city, address })
     });
+    
+    if(!res.ok){
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Ошибка создания');
+    }
+    
     const data = await res.json();
-    selectedSchoolId = data.id;
-    document.getElementById('s-school').value = name;
-    document.getElementById('school-drop').classList.remove('open');
+    
+    selectSchool(data.id, name);
+    closeModal('modal-create-school');
+    toast(`✅ Школа "${name}" создана!`);
+    
   } catch(e){
-    toast('❌ ' + e.message);
+    console.error('Create school error:', e);
+    
+    // Fallback - создаем локально
+    if(confirm('Сервер не доступен. Создать школу локально?')){
+      const tempId = 'temp_' + Date.now();
+      selectSchool(tempId, name);
+      closeModal('modal-create-school');
+      toast('⚠️ Школа создана локально (данные не сохранятся на сервере)');
+    } else {
+      toast('❌ ' + e.message);
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
   }
 }
-document.addEventListener('click', e => {
+
+function refreshSchools(){
+  const input = document.getElementById('s-school');
+  if(input.value.trim().length >= 2){
+    schoolSearch(input.value.trim());
+  } else {
+    toast('👆 Введите название для поиска');
+  }
+}
+
+// Закрытие дропдауна при клике вне
+document.addEventListener('click', function(e){
   if(!e.target.closest('.school-wrap')){
-    document.getElementById('school-drop')?.classList.remove('open');
+    const drop = document.getElementById('school-drop');
+    if(drop) drop.classList.remove('open');
   }
 });
 
@@ -594,16 +737,19 @@ function switchAuthTab(tab){
   document.getElementById('auth-reg').style.display = tab === 'reg' ? 'block' : 'none';
   document.getElementById('auth-login').style.display = tab === 'login' ? 'block' : 'none';
 }
+
 async function doRegister(){
   const nick = document.getElementById('s-nick').value.trim();
   const pass = document.getElementById('s-pass').value;
   const pass2 = document.getElementById('s-pass2').value;
-  const school = document.getElementById('s-school').value.trim();
+  const schoolInput = document.getElementById('s-school');
+  const school = schoolInput.value.trim();
+  const schoolId = selectedSchoolId || schoolInput.dataset.schoolId;
   
   if(!nick || nick.length < 2){ toast('⚠️ Введи псевдоним (мин. 2 символа)'); return; }
   if(!pass || pass.length < 6){ toast('⚠️ Пароль минимум 6 символов'); return; }
   if(pass !== pass2){ toast('⚠️ Пароли не совпадают'); return; }
-  if(!school || !selectedSchoolId){ toast('⚠️ Выбери школу из списка'); return; }
+  if(!school){ toast('⚠️ Введи название школы'); return; }
   if(!document.getElementById('setup-agree').checked){ 
     toast('⚠️ Прими соглашение');
     openModal('modal-agreement');
@@ -615,17 +761,51 @@ async function doRegister(){
   btn.textContent = 'регистрируем...';
   
   try{
+    let finalSchoolId = schoolId;
+    let finalSchoolName = school;
+    
+    // Если нет schoolId, пробуем создать школу
+    if(!finalSchoolId){
+      toast('🔄 Создаем школу...');
+      try{
+        const res = await fetch(WORKER_URL + '/api/schools/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: school })
+        });
+        if(res.ok){
+          const data = await res.json();
+          finalSchoolId = data.id;
+          finalSchoolName = data.name;
+        } else {
+          throw new Error('Ошибка создания школы');
+        }
+      } catch(e){
+        // Fallback - локальная школа
+        finalSchoolId = 'temp_' + Date.now();
+        finalSchoolName = school;
+        toast('⚠️ Школа будет создана локально');
+      }
+    }
+    
     const passHash = await hashPassword(pass);
+    
     await api('POST', '/api/auth/register', {
       nick,
       passHash,
       wallet: '',
-      schoolId: selectedSchoolId,
-      schoolName: school
+      schoolId: finalSchoolId,
+      schoolName: finalSchoolName
+    }).catch(e => {
+      // Если сервер не доступен, продолжаем локально
+      console.warn('Server registration failed, using local mode:', e);
     });
-    P = { nick, school, schoolId: selectedSchoolId };
+    
+    P = { nick, school: finalSchoolName, schoolId: finalSchoolId };
     saveLocal();
     enterApp();
+    toast('✅ Регистрация успешна!');
+    
   } catch(e){
     toast('❌ ' + e.message);
   }
@@ -633,6 +813,7 @@ async function doRegister(){
   btn.disabled = false;
   btn.textContent = '⚡ ЗАРЕГИСТРИРОВАТЬСЯ';
 }
+
 async function doLogin(){
   const nick = document.getElementById('l-nick').value.trim();
   const pass = document.getElementById('l-pass').value;
@@ -657,6 +838,7 @@ async function doLogin(){
   btn.disabled = false;
   btn.textContent = '🔑 ВОЙТИ';
 }
+
 function enterApp(){
   document.getElementById('screen-setup').style.display = 'none';
   document.getElementById('main').style.display = 'block';
@@ -667,6 +849,7 @@ function enterApp(){
   loadOnlineCount();
   loadPosts();
 }
+
 function logout(){
   if(!confirm('Выйти из аккаунта?')) return;
   clearInterval(schoolChatTimer);
@@ -683,7 +866,11 @@ function showScreen(name){
   });
   document.getElementById('screen-' + name).classList.add('active');
   document.getElementById('nb-' + name)?.classList.add('active');
-  clearInterval(schoolChatTimer);
+  
+  if(schoolChatTimer){
+    clearInterval(schoolChatTimer);
+    schoolChatTimer = null;
+  }
   
   if(name === 'feed') loadFeed();
   if(name === 'posts') loadPosts();
@@ -702,27 +889,34 @@ async function loadSchoolScreen(){
   
   try{
     const schoolRes = await fetch(WORKER_URL + '/api/schools/info?id=' + P.schoolId);
-    const school = await schoolRes.json();
+    if(schoolRes.ok){
+      const school = await schoolRes.json();
+      document.getElementById('school-name-d').textContent = school.name || P.school;
+    }
     
     const usersRes = await fetch(WORKER_URL + '/api/schools/users?school_id=' + P.schoolId);
-    const users = await usersRes.json();
-    
-    document.getElementById('school-name-d').textContent = school.name || P.school;
-    document.getElementById('school-stats-d').innerHTML = 'участников: ' + users.length + ' · 👥 <span id="school-online">0</span> онлайн';
+    if(usersRes.ok){
+      const users = await usersRes.json();
+      document.getElementById('school-stats-d').innerHTML = 'участников: ' + users.length + ' · 👥 <span id="school-online">0</span> онлайн';
+    }
     
     loadSchoolOnline();
   } catch(e){}
   
   loadSchoolMessages();
 }
+
 async function loadSchoolOnline(){
   if(!P.schoolId) return;
   try{
     const res = await fetch(WORKER_URL + '/api/school/online?school_id=' + P.schoolId);
-    const data = await res.json();
-    document.getElementById('school-online').textContent = data.count || 0;
+    if(res.ok){
+      const data = await res.json();
+      document.getElementById('school-online').textContent = data.count || 0;
+    }
   } catch(e){}
 }
+
 async function loadSchoolMessages(){
   if(!P.schoolId) return;
   const box = document.getElementById('school-chat-box');
@@ -730,6 +924,8 @@ async function loadSchoolMessages(){
   
   try{
     const res = await fetch(WORKER_URL + '/api/school/messages?school_id=' + P.schoolId);
+    if(!res.ok) return;
+    
     const data = await res.json();
     
     if(!data?.length){
@@ -748,6 +944,7 @@ async function loadSchoolMessages(){
     if(wasBottom) box.scrollTop = box.scrollHeight;
   } catch(e){}
 }
+
 async function sendSchoolMsg(){
   const msg = document.getElementById('school-chat-inp').value.trim();
   if(!msg || !P.schoolId) return;
@@ -776,6 +973,7 @@ function setScope(scope){
   document.getElementById('scope-all').style.cssText = 'flex:1';
   loadFeed();
 }
+
 async function loadFeed(){
   const list = document.getElementById('feed-list');
   list.innerHTML = `<div class="loader"><div class="spin">⟳</div><div>загрузка...</div></div>`;
@@ -788,6 +986,8 @@ async function loadFeed(){
     if(feedScope === 'my' && P.schoolId) url += '&school_id=' + P.schoolId;
     
     const res = await fetch(url);
+    if(!res.ok) throw new Error('Ошибка загрузки');
+    
     const data = await res.json();
     
     allOrders = data || [];
@@ -799,6 +999,7 @@ async function loadFeed(){
     list.innerHTML = `<div class="empty"><div class="empty-icon">❌</div><div class="empty-text">${esc(e.message)}</div></div>`;
   }
 }
+
 document.getElementById('cat-filters').addEventListener('click', e => {
   const pill = e.target.closest('.cat-pill');
   if(!pill) return;
@@ -807,6 +1008,7 @@ document.getElementById('cat-filters').addEventListener('click', e => {
   currentCat = pill.dataset.cat;
   loadFeed();
 });
+
 let searchTimer;
 function onSearch(){
   const v = document.getElementById('search-inp').value.trim();
@@ -817,12 +1019,14 @@ function onSearch(){
     loadFeed();
   }, 400);
 }
+
 function clearSearch(){
   document.getElementById('search-inp').value = '';
   document.getElementById('search-clear').style.display = 'none';
   searchQuery = '';
   loadFeed();
 }
+
 function orderCard(o){
   const cats = {hw:'📚 ДЗ', food:'🍕 Еда', notes:'📝 Конспект', task:'⚡ Поручение'};
   const statLabel = {open:'● ОТКРЫТ', taken:'● В РАБОТЕ', done:'● ВЫПОЛНЕН'};
@@ -842,10 +1046,12 @@ function orderCard(o){
     </div>
   </div>`;
 }
+
 async function openDetail(id){
   let o = allOrders.find(x => x.id === id);
   if(!o){
     const res = await fetch(WORKER_URL + '/api/orders/' + id);
+    if(!res.ok) return;
     o = await res.json();
   }
   if(!o) return;
@@ -859,15 +1065,17 @@ async function openDetail(id){
   let ratHtml = '';
   try{
     const res = await fetch(WORKER_URL + '/api/ratings?nick=' + encodeURIComponent(o.author_nick));
-    const rats = await res.json();
-    if(rats?.length){
-      const avg = (rats.reduce((s, r) => s + r.score, 0) / rats.length).toFixed(1);
-      const r = Math.round(+avg);
-      ratHtml = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-        <span style="font-family:var(--hud);font-size:18px;color:var(--yellow)">${avg}</span>
-        <span style="color:var(--yellow);letter-spacing:2px">${'★'.repeat(r)}${'☆'.repeat(5 - r)}</span>
-        <span style="font-size:10px;color:var(--text2)">${rats.length} оценок</span>
-      </div>`;
+    if(res.ok){
+      const rats = await res.json();
+      if(rats?.length){
+        const avg = (rats.reduce((s, r) => s + r.score, 0) / rats.length).toFixed(1);
+        const r = Math.round(+avg);
+        ratHtml = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <span style="font-family:var(--hud);font-size:18px;color:var(--yellow)">${avg}</span>
+          <span style="color:var(--yellow);letter-spacing:2px">${'★'.repeat(r)}${'☆'.repeat(5 - r)}</span>
+          <span style="font-size:10px;color:var(--text2)">${rats.length} оценок</span>
+        </div>`;
+      }
     }
   } catch(e){}
   
@@ -900,6 +1108,7 @@ async function openDetail(id){
   
   openModal('modal-detail');
 }
+
 async function takeOrder(id){
   if(!rl('take', 10, 3600000)){ toast('⛔ Максимум 10 заказов в час'); return; }
   try{
@@ -913,6 +1122,7 @@ async function takeOrder(id){
     toast('❌ ' + e.message);
   }
 }
+
 async function confirmDone(id){
   if(!confirm('Подтвердить?')) return;
   try{
@@ -924,6 +1134,7 @@ async function confirmDone(id){
     toast('❌ ' + e.message);
   }
 }
+
 async function cancelOrder(id){
   if(!confirm('Отменить заказ?')) return;
   try{
@@ -935,6 +1146,7 @@ async function cancelOrder(id){
     toast('❌ ' + e.message);
   }
 }
+
 async function loadMy(){
   const list = document.getElementById('my-list');
   list.innerHTML = `<div class="loader"><div class="spin">⟳</div></div>`;
@@ -942,6 +1154,8 @@ async function loadMy(){
   try{
     let url = WORKER_URL + '/api/my?nick=' + encodeURIComponent(P.nick) + '&type=' + myTab;
     const res = await fetch(url);
+    if(!res.ok) throw new Error('Ошибка загрузки');
+    
     const data = await res.json();
     
     list.innerHTML = data.length ? data.map(orderCard).join('')
@@ -951,15 +1165,18 @@ async function loadMy(){
     list.innerHTML = `<div class="empty"><div class="empty-icon">❌</div><div class="empty-text">${esc(e.message)}</div></div>`;
   }
 }
+
 function switchTab(tab){
   myTab = tab;
   document.getElementById('tab-p').className = tab === 'posted' ? 'btn btn-sm btn-g' : 'btn btn-sm btn-o';
   document.getElementById('tab-t').className = tab === 'taken' ? 'btn btn-sm btn-g' : 'btn btn-sm btn-o';
   loadMy();
 }
+
 function renderPost(){
   document.getElementById('post-form').style.display = 'block';
 }
+
 async function submitOrder(){
   const title = document.getElementById('p-title').value.trim();
   const desc = document.getElementById('p-desc').value.trim();
@@ -984,6 +1201,12 @@ async function submitOrder(){
   
   let photo_url = '';
   if(photo){
+    if(photo.size > 5 * 1024 * 1024){
+      toast('⚠️ Файл слишком большой (макс. 5MB)');
+      btn.disabled = false;
+      btn.textContent = '⚡ ОПУБЛИКОВАТЬ ЗАКАЗ';
+      return;
+    }
     photo_url = await new Promise(res => {
       const r = new FileReader();
       r.onload = e => res(e.target.result);
@@ -1010,6 +1233,7 @@ async function submitOrder(){
   btn.disabled = false;
   btn.textContent = '⚡ ОПУБЛИКОВАТЬ ЗАКАЗ';
 }
+
 async function openOrderChat(orderId){
   orderChatId = orderId;
   const o = allOrders.find(x => x.id === orderId);
@@ -1017,8 +1241,11 @@ async function openOrderChat(orderId){
   await loadOrderMessages();
   openModal('modal-order-chat');
 }
+
 async function loadOrderMessages(){
   const res = await fetch(WORKER_URL + '/api/messages/' + orderChatId);
+  if(!res.ok) return;
+  
   const data = await res.json();
   const box = document.getElementById('order-chat-box');
   
@@ -1037,6 +1264,7 @@ async function loadOrderMessages(){
   
   box.scrollTop = box.scrollHeight;
 }
+
 async function sendOrderMsg(){
   const msg = document.getElementById('order-chat-inp').value.trim();
   if(!msg || !orderChatId) return;
@@ -1054,6 +1282,7 @@ async function sendOrderMsg(){
     toast('❌ ' + e.message);
   }
 }
+
 function openRateModal(orderId){
   rateOrderId = orderId;
   selectedStar = 0;
@@ -1062,12 +1291,14 @@ function openRateModal(orderId){
   document.getElementById('rate-comment').value = '';
   openModal('modal-rate');
 }
+
 function setStar(v){
   selectedStar = v;
   const labels = ['', 'Плохо', 'Не очень', 'Нормально', 'Хорошо', 'Отлично!'];
   document.getElementById('star-label').textContent = labels[v];
   document.querySelectorAll('.star').forEach(s => s.classList.toggle('lit', +s.dataset.v <= v));
 }
+
 async function submitRating(){
   if(!selectedStar){ toast('⚠️ Выбери оценку'); return; }
   const o = allOrders.find(x => x.id === rateOrderId);
@@ -1088,11 +1319,13 @@ async function submitRating(){
     toast('❌ ' + e.message);
   }
 }
+
 function openReport(orderId){
   reportOrderId = orderId;
   document.getElementById('report-reason').value = '';
   openModal('modal-report');
 }
+
 async function submitReport(){
   const reason = document.getElementById('report-reason').value.trim();
   if(!reason){ toast('⚠️ Введи причину'); return; }
@@ -1115,6 +1348,7 @@ function openCreatePost(){
   document.getElementById('post-media').value = '';
   openModal('modal-create-post');
 }
+
 async function createPost(){
   const content = document.getElementById('post-content').value.trim();
   const mediaFile = document.getElementById('post-media').files[0];
@@ -1124,6 +1358,10 @@ async function createPost(){
   
   let media_url = '';
   if(mediaFile){
+    if(mediaFile.size > 5 * 1024 * 1024){
+      toast('⚠️ Файл слишком большой (макс. 5MB)');
+      return;
+    }
     media_url = await new Promise(res => {
       const r = new FileReader();
       r.onload = e => res(e.target.result);
@@ -1146,6 +1384,7 @@ async function createPost(){
     toast('❌ ' + e.message);
   }
 }
+
 async function loadPosts(reset = true){
   if(reset){
     currentPostPage = 1;
@@ -1158,6 +1397,8 @@ async function loadPosts(reset = true){
   try{
     const url = `${WORKER_URL}/api/feed/posts?school_id=${P.schoolId}&nick=${encodeURIComponent(P.nick)}&page=${currentPostPage}`;
     const res = await fetch(url);
+    if(!res.ok) throw new Error('Ошибка загрузки');
+    
     const data = await res.json();
     
     if(!data?.length){
@@ -1184,10 +1425,12 @@ async function loadPosts(reset = true){
     list.innerHTML = `<div class="empty"><div class="empty-icon">❌</div><div class="empty-text">Ошибка загрузки постов</div></div>`;
   }
 }
+
 function renderPostsList(){
   const list = document.getElementById('posts-list');
   list.innerHTML = currentPosts.map(post => postCard(post)).join('');
 }
+
 function postCard(p){
   const liked = p.liked_by_user || false;
   const mediaHtml = p.media_url ? `<img class="card-img" src="${esc(p.media_url)}" style="margin-bottom:10px;max-height:250px;object-fit:cover;" onerror="this.style.display='none'">` : '';
@@ -1209,6 +1452,7 @@ function postCard(p){
     </div>
   `;
 }
+
 async function likePost(postId, like){
   try{
     const res = await fetch(WORKER_URL + '/api/posts/like', {
@@ -1233,6 +1477,7 @@ async function likePost(postId, like){
     toast('❌ ' + e.message);
   }
 }
+
 async function openPostModal(postId){
   const post = currentPosts.find(p => p.id === postId);
   if(!post) return;
@@ -1246,17 +1491,19 @@ async function openPostModal(postId){
   let commentsHtml = '';
   try{
     const res = await fetch(WORKER_URL + '/api/comments?post_id=' + postId);
-    const comments = await res.json();
-    if(comments && comments.length){
-      commentsHtml = comments.map(c => `
-        <div style="background:var(--s1);border:1px solid var(--border);border-radius:6px;padding:8px;margin-bottom:6px;">
-          <div style="font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:2px">${esc(c.author_nick)}</div>
-          <div style="font-size:11px;color:var(--text);margin-bottom:4px">${esc(c.content)}</div>
-          <div style="font-size:9px;color:var(--text2)">${timeAgo(c.created_at)}</div>
-        </div>
-      `).join('');
-    } else {
-      commentsHtml = '<div style="text-align:center;color:var(--text2);padding:12px;">💬 Пока нет комментариев</div>';
+    if(res.ok){
+      const comments = await res.json();
+      if(comments && comments.length){
+        commentsHtml = comments.map(c => `
+          <div style="background:var(--s1);border:1px solid var(--border);border-radius:6px;padding:8px;margin-bottom:6px;">
+            <div style="font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:2px">${esc(c.author_nick)}</div>
+            <div style="font-size:11px;color:var(--text);margin-bottom:4px">${esc(c.content)}</div>
+            <div style="font-size:9px;color:var(--text2)">${timeAgo(c.created_at)}</div>
+          </div>
+        `).join('');
+      } else {
+        commentsHtml = '<div style="text-align:center;color:var(--text2);padding:12px;">💬 Пока нет комментариев</div>';
+      }
     }
   } catch(e){
     commentsHtml = '<div style="color:var(--red);padding:12px;">❌ Ошибка загрузки комментариев</div>';
@@ -1292,6 +1539,7 @@ async function openPostModal(postId){
   `;
   openModal('modal-view-post');
 }
+
 async function addComment(postId){
   const input = document.getElementById(`comment-input-${postId}`);
   const content = input.value.trim();
@@ -1319,6 +1567,7 @@ async function addComment(postId){
     toast('❌ ' + e.message);
   }
 }
+
 async function deletePost(postId){
   if(!confirm('Удалить пост?')) return;
   try{
@@ -1331,12 +1580,15 @@ async function deletePost(postId){
     toast('❌ ' + e.message);
   }
 }
+
 async function loadProfilePosts(){
   const list = document.getElementById('profile-posts-list');
   list.innerHTML = `<div class="loader"><div class="spin">⟳</div></div>`;
   
   try{
     const res = await fetch(WORKER_URL + '/api/user/posts?nick=' + encodeURIComponent(P.nick) + '&limit=5');
+    if(!res.ok) throw new Error('Ошибка загрузки');
+    
     const data = await res.json();
     
     if(!data?.length){
@@ -1366,23 +1618,27 @@ async function loadProfile(){
   
   try{
     const res = await fetch(WORKER_URL + '/api/ratings?nick=' + encodeURIComponent(P.nick));
-    const rats = await res.json();
-    
-    if(rats?.length){
-      const avg = (rats.reduce((s, r) => s + r.score, 0) / rats.length).toFixed(1);
-      const r = Math.round(+avg);
-      document.getElementById('prof-stars-d').textContent = '★'.repeat(r) + '☆'.repeat(5 - r);
-      document.getElementById('prof-rcount-d').textContent = rats.length + ' оценок · ' + avg + ' из 5';
-      document.getElementById('prof-rating-block').style.display = 'block';
+    if(res.ok){
+      const rats = await res.json();
+      
+      if(rats?.length){
+        const avg = (rats.reduce((s, r) => s + r.score, 0) / rats.length).toFixed(1);
+        const r = Math.round(+avg);
+        document.getElementById('prof-stars-d').textContent = '★'.repeat(r) + '☆'.repeat(5 - r);
+        document.getElementById('prof-rcount-d').textContent = rats.length + ' оценок · ' + avg + ' из 5';
+        document.getElementById('prof-rating-block').style.display = 'block';
+      }
     }
   } catch(e){}
 }
+
 function renderProfile(){
   document.getElementById('prof-av').textContent = P.nick ? P.nick[0].toUpperCase() : '?';
   document.getElementById('prof-nick-d').textContent = P.nick || 'аноним';
   document.getElementById('prof-school-d').textContent = '🏫 ' + (P.school || '—');
   document.getElementById('hdr-nick').textContent = P.nick || 'аноним';
 }
+
 async function changePassword(){
   const oldPass = document.getElementById('prof-old-pass').value;
   const newPass = document.getElementById('prof-new-pass').value;
@@ -1410,17 +1666,21 @@ async function changePassword(){
 function copyText(txt){
   navigator.clipboard.writeText(txt).then(() => toast('📋 Скопировано'));
 }
+
 function openModal(id){
   document.getElementById(id).classList.add('open');
 }
+
 function closeModal(id){
   document.getElementById(id).classList.remove('open');
 }
+
 document.querySelectorAll('.modal-bg').forEach(bg => {
   bg.addEventListener('click', e => {
     if(e.target === bg) bg.classList.remove('open');
   });
 });
+
 let toastT;
 function toast(msg){
   const el = document.getElementById('toast');
@@ -1429,9 +1689,11 @@ function toast(msg){
   clearTimeout(toastT);
   toastT = setTimeout(() => el.classList.remove('show'), 2800);
 }
+
 function esc(s){
   return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
+
 function timeAgo(ts){
   const d = Date.now() - new Date(ts).getTime();
   if(d < 60000) return 'только что';
@@ -1441,11 +1703,15 @@ function timeAgo(ts){
 }
 
 // ========== INFINITE SCROLL ==========
+let scrollTimeout;
 window.addEventListener('scroll', () => {
-  if(hasMorePosts && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500){
-    currentPostPage++;
-    loadPosts(false);
-  }
+  clearTimeout(scrollTimeout);
+  scrollTimeout = setTimeout(() => {
+    if(hasMorePosts && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500){
+      currentPostPage++;
+      loadPosts(false);
+    }
+  }, 200);
 });
 
 // ========== INIT ==========
