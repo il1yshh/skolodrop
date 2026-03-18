@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>СКУЛДРОП</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+/* ==== СТИЛИ (без изменений, всё как у тебя) ==== */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#030305;--s1:#07070e;--s2:#0b0b16;--card:#0e0e1a;--card2:#12121f;
@@ -279,7 +279,7 @@ select.inp{appearance:none;cursor:pointer}
     <div id="feed-list"></div>
   </div>
 
-  <!-- POSTS (НОВЫЙ ЭКРАН - ПОСТЫ) -->
+  <!-- POSTS -->
   <div class="screen active" id="screen-posts">
     <div class="sec-head">
       <span class="sec-title">// ЛЕНТА ПОСТОВ</span>
@@ -324,10 +324,9 @@ select.inp{appearance:none;cursor:pointer}
     <div id="my-list"></div>
   </div>
 
-  <!-- POST -->
+  <!-- POST (новый заказ) -->
   <div class="screen" id="screen-post">
     <div class="sec-head"><span class="sec-title">// НОВЫЙ ЗАКАЗ</span></div>
-
     <div id="post-form">
       <div class="field"><label>КАТЕГОРИЯ</label>
         <select class="inp" id="p-cat">
@@ -414,16 +413,12 @@ select.inp{appearance:none;cursor:pointer}
 <!-- ФУТЕР С КОНТАКТАМИ -->
 <div style="text-align:center;padding:16px;font-size:11px;color:var(--text2);border-top:1px solid var(--border);margin-top:16px;background:rgba(3,3,5,.8);backdrop-filter:blur(10px);">
   <div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:6px;">
-    <!-- Email с кнопкой копирования -->
     <span style="display:flex;align-items:center;gap:6px;background:rgba(0,229,255,.05);padding:6px 12px;border-radius:20px;border:1px solid rgba(0,229,255,.1);">
       <span style="font-size:14px;">📧</span>
       <a href="mailto:mirrorsecret@proton.me" style="color:var(--cyan);text-decoration:none;border-bottom:1px dashed var(--cyan);">mirrorsecret@proton.me</a>
       <button onclick="copyText('mirrorsecret@proton.me')" style="background:none;border:none;color:var(--green);cursor:pointer;font-size:12px;padding:4px;" title="Копировать email">📋</button>
     </span>
-    
     <span style="color:var(--border2);">|</span>
-    
-    <!-- Telegram канал -->
     <span style="display:flex;align-items:center;gap:6px;background:rgba(0,229,255,.05);padding:6px 12px;border-radius:20px;border:1px solid rgba(0,229,255,.1);">
       <span style="font-size:14px;">📢</span>
       <a href="https://t.me/skolodrop" target="_blank" style="color:var(--cyan);text-decoration:none;border-bottom:1px dashed var(--cyan);">Новости</a>
@@ -442,7 +437,7 @@ select.inp{appearance:none;cursor:pointer}
 <div class="modal-bg" id="modal-report"><div class="modal"><div class="modal-handle"></div><div class="modal-title">🚩 ЖАЛОБА</div><div class="field"><label>ПРИЧИНА</label><textarea class="inp" id="report-reason" style="min-height:80px" maxlength="300"></textarea></div><button class="btn btn-r btn-full" onclick="submitReport()">🚩 ОТПРАВИТЬ</button><div class="gap"></div><button class="btn btn-o btn-full btn-sm" onclick="closeModal('modal-report')">Отмена</button></div></div>
 <div class="modal-bg" id="modal-agreement"><div class="modal"><div class="modal-handle"></div><div class="modal-title">📋 ПОЛЬЗОВАТЕЛЬСКОЕ СОГЛАШЕНИЕ</div><div style="font-size:11px;color:var(--text2);line-height:1.9;max-height:55vh;overflow-y:auto;padding-right:4px"><b style="color:var(--text)">1. ПЛАТФОРМА</b><br>СКУЛДРОП — информационная платформа (соцсеть + маркетплейс). Администрация не является стороной сделок между пользователями.<br><br><b style="color:var(--text)">2. ОТВЕТСТВЕННОСТЬ</b><br>Администрация <b style="color:var(--red)">не несёт ответственности</b> за качество выполнения заказов, споры между пользователями, невыполнение обязательств и убытки.<br><br><b style="color:var(--text)">3. КОМИССИЯ</b><br>Комиссия: <b style="color:var(--green)">0%</b>. Все расчёты наличными напрямую между пользователями.<br><br><b style="color:var(--text)">4. ЗАПРЕЩЕНО</b><br>Незаконные заказы, оружие, наркотики, угрозы, оскорбления.<br><br><b style="color:var(--text)">5. БЛОКИРОВКА</b><br>Администрация вправе заблокировать нарушителей без объяснений.<br><br><b style="color:var(--text)">6. КОНФИДЕНЦИАЛЬНОСТЬ</b><br>Персональные данные не собираются. Пароль хранится в виде SHA-256 хэша.<br><br><b style="color:var(--red)">Регистрируясь вы принимаете все условия соглашения.</b></div><div class="gap"></div><button class="btn btn-g btn-full" onclick="closeModal('modal-agreement');['setup-agree','agree-check'].forEach(id=>{const el=document.getElementById(id);if(el)el.checked=true})">✅ ПРИНИМАЮ</button><div class="gap"></div><button class="btn btn-o btn-full btn-sm" onclick="closeModal('modal-agreement')">Закрыть</button></div></div>
 
-<!-- НОВЫЕ МОДАЛКИ ДЛЯ ПОСТОВ -->
+<!-- МОДАЛКИ ДЛЯ ПОСТОВ -->
 <div class="modal-bg" id="modal-create-post"><div class="modal"><div class="modal-handle"></div><div class="modal-title">📝 НОВЫЙ ПОСТ</div>
   <div class="field"><label>ТЕКСТ ПОСТА</label>
     <textarea class="inp" id="post-content" placeholder="Что у тебя нового?" style="min-height:100px" maxlength="2000"></textarea>
@@ -464,558 +459,679 @@ select.inp{appearance:none;cursor:pointer}
 <div id="toast"></div>
 
 <script>
-const WORKER_URL = 'https://5.42.118.119:8000/';
-
-
+// ========== КОНФИГУРАЦИЯ ==========
+const WORKER_URL = 'http://5.42.118.119:8000';
 const COMMISSION = 0.05;
-const DB_OK = SUPABASE_URL !== 'YOUR_SUPABASE_URL';
-let sb = DB_OK ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
+// ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
 let P = { nick:'', school:'', schoolId:null };
-let myTaken=[], currentCat='all', myTab='posted', feedScope='my';
-let rateOrderId=null, reportOrderId=null, orderChatId=null, selectedStar=0;
-let searchQuery='', allOrders=[], schoolChatTimer=null, selectedSchoolId=null;
+let myTaken = [];
+let currentCat = 'all';
+let myTab = 'posted';
+let feedScope = 'my';
+let rateOrderId = null;
+let reportOrderId = null;
+let orderChatId = null;
+let selectedStar = 0;
+let searchQuery = '';
+let allOrders = [];
+let schoolChatTimer = null;
+let selectedSchoolId = null;
 let lastOrderCount = 0;
-
-// Новые переменные для постов
 let currentPosts = [];
 let currentPostPage = 1;
 let hasMorePosts = true;
 
+// ========== LOCAL STORAGE ==========
 function loadLocal(){
   try{
-    const p=localStorage.getItem('sd_p');if(p)P=JSON.parse(p);
-    const t=localStorage.getItem('sd_t');if(t)myTaken=JSON.parse(t);
-  }catch(e){}
+    const p = localStorage.getItem('sd_p');
+    if(p) P = JSON.parse(p);
+    const t = localStorage.getItem('sd_t');
+    if(t) myTaken = JSON.parse(t);
+  } catch(e) {}
 }
 function saveLocal(){
-  localStorage.setItem('sd_p',JSON.stringify(P));
-  localStorage.setItem('sd_t',JSON.stringify(myTaken));
+  localStorage.setItem('sd_p', JSON.stringify(P));
+  localStorage.setItem('sd_t', JSON.stringify(myTaken));
 }
-function rl(key,limit,ms){
-  const now=Date.now();
-  let d=JSON.parse(localStorage.getItem('rl_'+key)||'{"ts":0,"c":0}');
-  if(now-d.ts>ms)d={ts:now,c:0};
-  if(d.c>=limit)return false;
-  d.c++;localStorage.setItem('rl_'+key,JSON.stringify(d));return true;
+
+// ========== RATE LIMIT ==========
+function rl(key, limit, ms){
+  const now = Date.now();
+  let d = JSON.parse(localStorage.getItem('rl_' + key) || '{"ts":0,"c":0}');
+  if(now - d.ts > ms) d = {ts: now, c: 0};
+  if(d.c >= limit) return false;
+  d.c++;
+  localStorage.setItem('rl_' + key, JSON.stringify(d));
+  return true;
 }
-async function api(method,path,body){
-  if(WORKER_URL==='YOUR_WORKER_URL')throw new Error('Вставь Worker URL в код');
-  const opts={method,headers:{'Content-Type':'application/json'}};
-  if(body)opts.body=JSON.stringify(body);
-  const res=await fetch(WORKER_URL+path,opts);
-  const d=await res.json().catch(()=>({}));
-  if(!res.ok)throw new Error(d.error||'Ошибка сервера');
+
+// ========== API HELPER ==========
+async function api(method, path, body){
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json' }
+  };
+  if(body) opts.body = JSON.stringify(body);
+  
+  const res = await fetch(WORKER_URL + path, opts);
+  const d = await res.json().catch(() => ({}));
+  if(!res.ok) throw new Error(d.error || 'Ошибка сервера');
   return d;
 }
 
+// ========== HASH PASSWORD ==========
 async function hashPassword(pass){
-  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pass));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pass));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// ── ONLINE ─────────────────────────────────────
+// ========== ONLINE ==========
 async function loadOnlineCount(){
   try{
-    const res = await fetch(WORKER_URL+'/api/online');
+    const res = await fetch(WORKER_URL + '/api/online');
     const data = await res.json();
     document.getElementById('online-count-header').textContent = data.count;
-  }catch(e){}
+  } catch(e){}
+}
+setInterval(loadOnlineCount, 30000);
+
+// ========== SCHOOL SEARCH ==========
+async function schoolSearch(query){
+  const drop = document.getElementById('school-drop');
+  if(!query || query.length < 1){
+    drop.classList.remove('open');
+    return;
+  }
+  
+  try{
+    const res = await fetch(WORKER_URL + '/api/schools/search?q=' + encodeURIComponent(query));
+    const schools = await res.json();
+    
+    let html = schools.map(s => 
+      `<div class="school-opt" onclick="selectSchool(${s.id}, '${esc(s.name)}')">${esc(s.name)}</div>`
+    ).join('');
+    html += `<div class="school-opt new-s" onclick="createAndSelectSchool('${esc(query)}')">+ Создать: ${esc(query)}</div>`;
+    
+    drop.innerHTML = html;
+    drop.classList.add('open');
+  } catch(e){
+    drop.classList.remove('open');
+  }
+}
+function selectSchool(id, name){
+  selectedSchoolId = id;
+  document.getElementById('s-school').value = name;
+  document.getElementById('school-drop').classList.remove('open');
+}
+async function createAndSelectSchool(name){
+  try{
+    const res = await fetch(WORKER_URL + '/api/schools/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
+    });
+    const data = await res.json();
+    selectedSchoolId = data.id;
+    document.getElementById('s-school').value = name;
+    document.getElementById('school-drop').classList.remove('open');
+  } catch(e){
+    toast('❌ ' + e.message);
+  }
+}
+document.addEventListener('click', e => {
+  if(!e.target.closest('.school-wrap')){
+    document.getElementById('school-drop')?.classList.remove('open');
+  }
+});
+
+// ========== AUTH ==========
+function switchAuthTab(tab){
+  document.getElementById('atab-reg').classList.toggle('on', tab === 'reg');
+  document.getElementById('atab-login').classList.toggle('on', tab === 'login');
+  document.getElementById('auth-reg').style.display = tab === 'reg' ? 'block' : 'none';
+  document.getElementById('auth-login').style.display = tab === 'login' ? 'block' : 'none';
+}
+async function doRegister(){
+  const nick = document.getElementById('s-nick').value.trim();
+  const pass = document.getElementById('s-pass').value;
+  const pass2 = document.getElementById('s-pass2').value;
+  const school = document.getElementById('s-school').value.trim();
+  
+  if(!nick || nick.length < 2){ toast('⚠️ Введи псевдоним (мин. 2 символа)'); return; }
+  if(!pass || pass.length < 6){ toast('⚠️ Пароль минимум 6 символов'); return; }
+  if(pass !== pass2){ toast('⚠️ Пароли не совпадают'); return; }
+  if(!school || !selectedSchoolId){ toast('⚠️ Выбери школу из списка'); return; }
+  if(!document.getElementById('setup-agree').checked){ 
+    toast('⚠️ Прими соглашение');
+    openModal('modal-agreement');
+    return;
+  }
+  
+  const btn = document.getElementById('reg-btn');
+  btn.disabled = true;
+  btn.textContent = 'регистрируем...';
+  
+  try{
+    const passHash = await hashPassword(pass);
+    await api('POST', '/api/auth/register', {
+      nick,
+      passHash,
+      wallet: '',
+      schoolId: selectedSchoolId,
+      schoolName: school
+    });
+    P = { nick, school, schoolId: selectedSchoolId };
+    saveLocal();
+    enterApp();
+  } catch(e){
+    toast('❌ ' + e.message);
+  }
+  
+  btn.disabled = false;
+  btn.textContent = '⚡ ЗАРЕГИСТРИРОВАТЬСЯ';
+}
+async function doLogin(){
+  const nick = document.getElementById('l-nick').value.trim();
+  const pass = document.getElementById('l-pass').value;
+  
+  if(!nick){ toast('⚠️ Введи ник'); return; }
+  if(!pass){ toast('⚠️ Введи пароль'); return; }
+  
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.textContent = 'входим...';
+  
+  try{
+    const passHash = await hashPassword(pass);
+    const d = await api('POST', '/api/auth/login', { nick, passHash });
+    P = { nick, school: d.school || '', schoolId: d.schoolId || null };
+    saveLocal();
+    enterApp();
+  } catch(e){
+    toast('❌ ' + e.message);
+  }
+  
+  btn.disabled = false;
+  btn.textContent = '🔑 ВОЙТИ';
+}
+function enterApp(){
+  document.getElementById('screen-setup').style.display = 'none';
+  document.getElementById('main').style.display = 'block';
+  document.getElementById('nav').style.display = 'flex';
+  document.getElementById('hdr-nick').textContent = P.nick;
+  showScreen('posts');
+  renderProfile();
+  loadOnlineCount();
+  loadPosts();
+}
+function logout(){
+  if(!confirm('Выйти из аккаунта?')) return;
+  clearInterval(schoolChatTimer);
+  localStorage.clear();
+  location.reload();
+}
+
+// ========== SCREEN MANAGEMENT ==========
+const SCREENS = ['feed','posts','school','my','post','profile'];
+function showScreen(name){
+  SCREENS.forEach(s => {
+    document.getElementById('screen-' + s)?.classList.remove('active');
+    document.getElementById('nb-' + s)?.classList.remove('active');
+  });
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('nb-' + name)?.classList.add('active');
+  clearInterval(schoolChatTimer);
+  
+  if(name === 'feed') loadFeed();
+  if(name === 'posts') loadPosts();
+  if(name === 'school') {
+    loadSchoolScreen();
+    schoolChatTimer = setInterval(loadSchoolMessages, 5000);
+  }
+  if(name === 'my') loadMy();
+  if(name === 'post') renderPost();
+  if(name === 'profile') loadProfile();
+}
+
+// ========== SCHOOL SCREEN ==========
+async function loadSchoolScreen(){
+  if(!P.schoolId) return;
+  
+  try{
+    const schoolRes = await fetch(WORKER_URL + '/api/schools/info?id=' + P.schoolId);
+    const school = await schoolRes.json();
+    
+    const usersRes = await fetch(WORKER_URL + '/api/schools/users?school_id=' + P.schoolId);
+    const users = await usersRes.json();
+    
+    document.getElementById('school-name-d').textContent = school.name || P.school;
+    document.getElementById('school-stats-d').innerHTML = 'участников: ' + users.length + ' · 👥 <span id="school-online">0</span> онлайн';
+    
+    loadSchoolOnline();
+  } catch(e){}
+  
+  loadSchoolMessages();
 }
 async function loadSchoolOnline(){
   if(!P.schoolId) return;
   try{
-    const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-    const {data} = await sb.from('users').select('id').eq('school_id',P.schoolId).gte('last_seen',fiveMinAgo);
-    document.getElementById('school-online').textContent = data?.length || 0;
-  }catch(e){}
-}
-setInterval(loadOnlineCount, 30000);
-setInterval(loadSchoolOnline, 30000);
-
-// ── NOTIFICATION ─────────────────────────────────────
-async function checkNewOrders(){
-  if(!P.nick) return;
-  try{
-    const {data} = await sb.from('orders').select('id,title,amount,cat').eq('status','open').order('created_at',{ascending:false}).limit(1);
-    if(!data?.length) return;
-    const lastId = data[0].id;
-    if(lastOrderCount === 0){
-      lastOrderCount = 1;
-      return;
-    }
-    if(lastOrderCount === 1) return;
-    const cats = {hw:'📚',food:'🍕',notes:'📝',task:'⚡'};
-    showNotification(`Новый заказ: ${cats[data[0].cat] || ''} ${data[0].title} — ${data[0].amount} ₽`, data[0].id);
-    lastOrderCount = 1;
-  }catch(e){}
-}
-function showNotification(text, orderId){
-  const n = document.createElement('div');
-  n.style.position = 'fixed';
-  n.style.bottom = '90px';
-  n.style.left = '50%';
-  n.style.transform = 'translateX(-50%)';
-  n.style.backgroundColor = 'var(--card)';
-  n.style.border = '2px solid var(--green)';
-  n.style.borderRadius = '8px';
-  n.style.padding = '12px 18px';
-  n.style.fontSize = '12px';
-  n.style.color = 'var(--text)';
-  n.style.zIndex = '1000';
-  n.style.cursor = 'pointer';
-  n.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-  n.style.maxWidth = '90%';
-  n.style.textAlign = 'center';
-  n.textContent = text;
-  n.onclick = async ()=>{
-    await openDetail(orderId);
-    n.remove();
-  };
-  document.body.appendChild(n);
-  setTimeout(() => n.remove(), 10000);
-}
-setInterval(checkNewOrders, 15000);
-
-// ── SCHOOL SEARCH ─────────────────────────────────────
-async function schoolSearch(query){
-  const drop=document.getElementById('school-drop');
-  if(!query||query.length<1){drop.classList.remove('open');return;}
-  if(!DB_OK){
-    drop.innerHTML=`<div class="school-opt new-s" onclick="createAndSelectSchool('${esc(query)}')">+ Создать: ${esc(query)}</div>`;
-    drop.classList.add('open');return;
-  }
-  try{
-    const{data}=await sb.from('schools').select('id,name').ilike('name',`%${query}%`).limit(8);
-    let html='';
-    if(data?.length)html=data.map(s=>`<div class="school-opt" onclick="selectSchool(${s.id},'${esc(s.name)}')">${esc(s.name)}</div>`).join('');
-    html+=`<div class="school-opt new-s" onclick="createAndSelectSchool('${esc(query)}')">+ Создать: ${esc(query)}</div>`;
-    drop.innerHTML=html;drop.classList.add('open');
-  }catch(e){drop.classList.remove('open');}
-}
-function selectSchool(id,name){
-  selectedSchoolId=id;
-  document.getElementById('s-school').value=name;
-  document.getElementById('school-drop').classList.remove('open');
-}
-async function createAndSelectSchool(name){
-  if(!DB_OK){selectedSchoolId=-1;document.getElementById('s-school').value=name;document.getElementById('school-drop').classList.remove('open');return;}
-  try{
-    const{data,error}=await sb.from('schools').insert({name}).select('id').single();
-    if(error&&error.code==='23505'){
-      const{data:ex}=await sb.from('schools').select('id').eq('name',name).single();
-      selectedSchoolId=ex.id;
-    }else{selectedSchoolId=data.id;}
-    document.getElementById('s-school').value=name;
-    document.getElementById('school-drop').classList.remove('open');
-  }catch(e){toast('❌ '+e.message);}
-}
-document.addEventListener('click',e=>{
-  if(!e.target.closest('.school-wrap'))document.getElementById('school-drop')?.classList.remove('open');
-});
-
-// ── AUTH ──────────────────────────────────────────────
-function switchAuthTab(tab){
-  document.getElementById('atab-reg').classList.toggle('on',tab==='reg');
-  document.getElementById('atab-login').classList.toggle('on',tab==='login');
-  document.getElementById('auth-reg').style.display=tab==='reg'?'block':'none';
-  document.getElementById('auth-login').style.display=tab==='login'?'block':'none';
-}
-async function doRegister(){
-  const nick=document.getElementById('s-nick').value.trim();
-  const pass=document.getElementById('s-pass').value;
-  const pass2=document.getElementById('s-pass2').value;
-  const school=document.getElementById('s-school').value.trim();
-  if(!nick||nick.length<2){toast('⚠️ Введи псевдоним (мин. 2 символа)');return;}
-  if(!pass||pass.length<6){toast('⚠️ Пароль минимум 6 символов');return;}
-  if(pass!==pass2){toast('⚠️ Пароли не совпадают');return;}
-  if(!school||!selectedSchoolId){toast('⚠️ Выбери школу из списка');return;}
-  if(!document.getElementById('setup-agree').checked){toast('⚠️ Прими соглашение');openModal('modal-agreement');return;}
-  const btn=document.getElementById('reg-btn');
-  btn.disabled=true;btn.textContent='регистрируем...';
-  try{
-    const passHash=await hashPassword(pass);
-    await api('POST','/api/auth/register',{nick,passHash,wallet:'',schoolId:selectedSchoolId,schoolName:school});
-    P={nick,school,schoolId:selectedSchoolId};
-    saveLocal();enterApp();
-  }catch(e){toast('❌ '+e.message);}
-  btn.disabled=false;btn.textContent='⚡ ЗАРЕГИСТРИРОВАТЬСЯ';
-}
-async function doLogin(){
-  const nick=document.getElementById('l-nick').value.trim();
-  const pass=document.getElementById('l-pass').value;
-  if(!nick){toast('⚠️ Введи ник');return;}
-  if(!pass){toast('⚠️ Введи пароль');return;}
-  const btn=document.getElementById('login-btn');
-  btn.disabled=true;btn.textContent='входим...';
-  try{
-    const passHash=await hashPassword(pass);
-    const d=await api('POST','/api/auth/login',{nick,passHash});
-    P={nick,school:d.school||'',schoolId:d.schoolId||null};
-    saveLocal();enterApp();
-  }catch(e){toast('❌ '+e.message);}
-  btn.disabled=false;btn.textContent='🔑 ВОЙТИ';
-}
-function enterApp(){
-  document.getElementById('screen-setup').style.display='none';
-  document.getElementById('main').style.display='block';
-  document.getElementById('nav').style.display='flex';
-  document.getElementById('hdr-nick').textContent=P.nick;
-  showScreen('posts');
-  renderProfile();
-  loadOnlineCount();
-  loadSchoolOnline();
-  loadPosts();
-}
-function logout(){
-  if(!confirm('Выйти из аккаунта?'))return;
-  clearInterval(schoolChatTimer);
-  localStorage.clear();location.reload();
-}
-
-function updateBalanceUI(){saveLocal();}
-async function syncBalance(){}
-
-const SCREENS=['feed','posts','school','my','post','profile'];
-function showScreen(name){
-  SCREENS.forEach(s=>{
-    document.getElementById('screen-'+s)?.classList.remove('active');
-    document.getElementById('nb-'+s)?.classList.remove('active');
-  });
-  document.getElementById('screen-'+name).classList.add('active');
-  document.getElementById('nb-'+name)?.classList.add('active');
-  clearInterval(schoolChatTimer);
-  if(name==='feed')loadFeed();
-  if(name==='posts'){loadPosts();}
-  if(name==='school'){loadSchoolScreen();schoolChatTimer=setInterval(loadSchoolMessages,5000);}
-  if(name==='my')loadMy();
-  if(name==='post')renderPost();
-  if(name==='profile')loadProfile();
-}
-
-// ── SCHOOL SCREEN ─────────────────────────────────────
-async function loadSchoolScreen(){
-  if(!DB_OK||!P.schoolId)return;
-  try{
-    const{data:school}=await sb.from('schools').select('name').eq('id',P.schoolId).single();
-    const{count}=await sb.from('users').select('*',{count:'exact',head:true}).eq('school_id',P.schoolId);
-    document.getElementById('school-name-d').textContent=school?.name||P.school;
-    document.getElementById('school-stats-d').innerHTML = 'участников: '+(count||0)+' · 👥 <span id="school-online">0</span> онлайн';
-    await loadSchoolOnline();
-  }catch(e){}
-  loadSchoolMessages();
+    const res = await fetch(WORKER_URL + '/api/school/online?school_id=' + P.schoolId);
+    const data = await res.json();
+    document.getElementById('school-online').textContent = data.count || 0;
+  } catch(e){}
 }
 async function loadSchoolMessages(){
-  if(!DB_OK||!P.schoolId)return;
-  const box=document.getElementById('school-chat-box');
-  const wasBottom=box.scrollHeight-box.scrollTop-box.clientHeight<60;
+  if(!P.schoolId) return;
+  const box = document.getElementById('school-chat-box');
+  const wasBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
+  
   try{
-    const{data}=await sb.from('school_messages').select('*').eq('school_id',P.schoolId).order('created_at',{ascending:true}).limit(100);
-    if(!data?.length){box.innerHTML='<div style="text-align:center;color:var(--text2);font-size:11px;padding:30px">Будь первым — напиши в чат 👋</div>';return;}
-    box.innerHTML=data.map(m=>`
-      <div class="cmsg ${m.nick===P.nick?'mine':'theirs'}">
-        ${m.nick!==P.nick?`<div class="cnick">${esc(m.nick)}</div>`:''}
+    const res = await fetch(WORKER_URL + '/api/school/messages?school_id=' + P.schoolId);
+    const data = await res.json();
+    
+    if(!data?.length){
+      box.innerHTML = '<div style="text-align:center;color:var(--text2);font-size:11px;padding:30px">Будь первым — напиши в чат 👋</div>';
+      return;
+    }
+    
+    box.innerHTML = data.map(m => `
+      <div class="cmsg ${m.nick === P.nick ? 'mine' : 'theirs'}">
+        ${m.nick !== P.nick ? `<div class="cnick">${esc(m.nick)}</div>` : ''}
         <div class="cbubble">${esc(m.message)}</div>
         <div class="cmeta">${timeAgo(m.created_at)}</div>
-      </div>`).join('');
-    if(wasBottom)box.scrollTop=box.scrollHeight;
-  }catch(e){}
+      </div>
+    `).join('');
+    
+    if(wasBottom) box.scrollTop = box.scrollHeight;
+  } catch(e){}
 }
 async function sendSchoolMsg(){
-  const msg=document.getElementById('school-chat-inp').value.trim();
-  if(!msg||!P.schoolId)return;
-  if(!rl('school_chat',30,60000)){toast('⛔ Слишком быстро');return;}
+  const msg = document.getElementById('school-chat-inp').value.trim();
+  if(!msg || !P.schoolId) return;
+  if(!rl('school_chat', 30, 60000)){ toast('⛔ Слишком быстро'); return; }
+  
   try{
-    await api('POST','/api/school/message',{nick:P.nick,schoolId:P.schoolId,message:msg});
-    document.getElementById('school-chat-inp').value='';
+    await api('POST', '/api/school/message', {
+      nick: P.nick,
+      schoolId: P.schoolId,
+      message: msg
+    });
+    document.getElementById('school-chat-inp').value = '';
     await loadSchoolMessages();
-    document.getElementById('school-chat-box').scrollTop=9999;
-  }catch(e){toast('❌ '+e.message);}
+    document.getElementById('school-chat-box').scrollTop = 9999;
+  } catch(e){
+    toast('❌ ' + e.message);
+  }
 }
 
-// ── FEED (ЗАКАЗЫ) ─────────────────────────────────────
+// ========== FEED (ЗАКАЗЫ) ==========
 function setScope(scope){
-  feedScope=scope;
-  document.getElementById('scope-my').className=scope==='my'?'btn btn-sm':'btn btn-sm btn-o';
-  document.getElementById('scope-my').style.cssText=scope==='my'?'flex:1;background:rgba(0,229,255,.1);color:var(--cyan);border:1px solid rgba(0,229,255,.3)':'flex:1';
-  document.getElementById('scope-all').className=scope==='all'?'btn btn-sm btn-g':'btn btn-sm btn-o';
-  document.getElementById('scope-all').style.cssText='flex:1';
+  feedScope = scope;
+  document.getElementById('scope-my').className = scope === 'my' ? 'btn btn-sm' : 'btn btn-sm btn-o';
+  document.getElementById('scope-my').style.cssText = scope === 'my' ? 'flex:1;background:rgba(0,229,255,.1);color:var(--cyan);border:1px solid rgba(0,229,255,.3)' : 'flex:1';
+  document.getElementById('scope-all').className = scope === 'all' ? 'btn btn-sm btn-g' : 'btn btn-sm btn-o';
+  document.getElementById('scope-all').style.cssText = 'flex:1';
   loadFeed();
 }
 async function loadFeed(){
-  const list=document.getElementById('feed-list');
-  list.innerHTML=`<div class="loader"><div class="spin">⟳</div><div>загрузка...</div></div>`;
-  if(!DB_OK){
-    list.innerHTML=`<div class="empty"><div class="empty-icon">⚙️</div><div class="empty-text">Вставь ключи в код.<br>Смотри README.md</div></div>`;
-    document.getElementById('feed-cnt').textContent='нет БД';return;
-  }
+  const list = document.getElementById('feed-list');
+  list.innerHTML = `<div class="loader"><div class="spin">⟳</div><div>загрузка...</div></div>`;
+  
   try{
-    let q=sb.from('orders').select('*').order('created_at',{ascending:false});
-    if(currentCat!=='all')q=q.eq('cat',currentCat);
-    if(searchQuery)q=q.ilike('title',`%${searchQuery}%`);
-    if(feedScope==='my'&&P.schoolId)q=q.eq('school_id',P.schoolId);
-    const{data,error}=await q;
-    if(error)throw error;
-    allOrders=data||[];
-    document.getElementById('feed-cnt').textContent=allOrders.filter(o=>o.status==='open').length+' открытых';
-    list.innerHTML=allOrders.length?allOrders.map(orderCard).join('')
-      :`<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Пока нет заказов.<br>Нажми + чтобы добавить.</div></div>`;
-  }catch(e){list.innerHTML=`<div class="empty"><div class="empty-icon">❌</div><div class="empty-text">${esc(e.message)}</div></div>`;}
+    let url = WORKER_URL + '/api/feed?';
+    if(currentCat !== 'all') url += 'cat=' + currentCat + '&';
+    if(searchQuery) url += 'q=' + encodeURIComponent(searchQuery) + '&';
+    url += 'scope=' + feedScope;
+    if(feedScope === 'my' && P.schoolId) url += '&school_id=' + P.schoolId;
+    
+    const res = await fetch(url);
+    const data = await res.json();
+    
+    allOrders = data || [];
+    document.getElementById('feed-cnt').textContent = allOrders.filter(o => o.status === 'open').length + ' открытых';
+    
+    list.innerHTML = allOrders.length ? allOrders.map(orderCard).join('')
+      : `<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Пока нет заказов.<br>Нажми + чтобы добавить.</div></div>`;
+  } catch(e){
+    list.innerHTML = `<div class="empty"><div class="empty-icon">❌</div><div class="empty-text">${esc(e.message)}</div></div>`;
+  }
 }
-document.getElementById('cat-filters').addEventListener('click',e=>{
-  const pill=e.target.closest('.cat-pill');if(!pill)return;
-  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('on'));
-  pill.classList.add('on');currentCat=pill.dataset.cat;loadFeed();
+document.getElementById('cat-filters').addEventListener('click', e => {
+  const pill = e.target.closest('.cat-pill');
+  if(!pill) return;
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('on'));
+  pill.classList.add('on');
+  currentCat = pill.dataset.cat;
+  loadFeed();
 });
 let searchTimer;
 function onSearch(){
-  const v=document.getElementById('search-inp').value.trim();
-  document.getElementById('search-clear').style.display=v?'block':'none';
-  clearTimeout(searchTimer);searchTimer=setTimeout(()=>{searchQuery=v;loadFeed();},400);
+  const v = document.getElementById('search-inp').value.trim();
+  document.getElementById('search-clear').style.display = v ? 'block' : 'none';
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    searchQuery = v;
+    loadFeed();
+  }, 400);
 }
 function clearSearch(){
-  document.getElementById('search-inp').value='';
-  document.getElementById('search-clear').style.display='none';
-  searchQuery='';loadFeed();
+  document.getElementById('search-inp').value = '';
+  document.getElementById('search-clear').style.display = 'none';
+  searchQuery = '';
+  loadFeed();
 }
 function orderCard(o){
-  const cats={hw:'📚 ДЗ',food:'🍕 Еда',notes:'📝 Конспект',task:'⚡ Поручение'};
-  const statLabel={open:'● ОТКРЫТ',taken:'● В РАБОТЕ',done:'● ВЫПОЛНЕН'};
-  const statClass={open:'s-open',taken:'s-taken',done:'s-done'};
-  const priceStr=esc(o.amount)+' ₽ 💵';
-  const schoolTag=o.school_name&&feedScope==='all'?`<span style="font-size:9px;color:var(--cyan);margin-left:6px">🏫${esc(o.school_name)}</span>`:'';
-  const img=o.photo_url?`<img class="card-img" src="${esc(o.photo_url)}" onerror="this.style.display='none'">` :'';
+  const cats = {hw:'📚 ДЗ', food:'🍕 Еда', notes:'📝 Конспект', task:'⚡ Поручение'};
+  const statLabel = {open:'● ОТКРЫТ', taken:'● В РАБОТЕ', done:'● ВЫПОЛНЕН'};
+  const statClass = {open:'s-open', taken:'s-taken', done:'s-done'};
+  const priceStr = esc(o.amount) + ' ₽ 💵';
+  const schoolTag = o.school_name && feedScope === 'all' ? `<span style="font-size:9px;color:var(--cyan);margin-left:6px">🏫${esc(o.school_name)}</span>` : '';
+  const img = o.photo_url ? `<img class="card-img" src="${esc(o.photo_url)}" onerror="this.style.display=\'none\'">` : '';
+  
   return `<div class="order-card cat-${esc(o.cat)}" onclick="openDetail('${o.id}')">
-    <div class="card-top"><span class="cat-tag">${cats[o.cat]||o.cat}</span><span class="card-price">${priceStr}</span></div>
+    <div class="card-top"><span class="cat-tag">${cats[o.cat] || o.cat}</span><span class="card-price">${priceStr}</span></div>
     <div class="card-title">${esc(o.title)}</div>
-    ${o.description?`<div class="card-desc">${esc(o.description).slice(0,110)}${(o.description||'').length>110?'...':''}</div>`:''}
+    ${o.description ? `<div class="card-desc">${esc(o.description).slice(0,110)}${(o.description||'').length > 110 ? '...' : ''}</div>` : ''}
     ${img}
     <div class="card-bottom">
       <span class="card-meta">${esc(o.author_nick)}${schoolTag} · ${timeAgo(o.created_at)}</span>
-      <span class="status-badge ${statClass[o.status]||''}">${statLabel[o.status]||o.status}</span>
+      <span class="status-badge ${statClass[o.status] || ''}">${statLabel[o.status] || o.status}</span>
     </div>
   </div>`;
 }
-
 async function openDetail(id){
-  let o=allOrders.find(x=>x.id===id);
-  if(!o&&DB_OK){const{data}=await sb.from('orders').select('*').eq('id',id).single();o=data;}
-  if(!o)return;
-  const cats={hw:'📚 ДЗ',food:'🍕 Еда',notes:'📝 Конспект',task:'⚡ Поручение'};
-  const isMine=o.author_nick===P.nick;
-  const iAmTaker=myTaken.includes(id);
-  const priceStr=esc(o.amount)+' ₽ 💵';
-  const img=o.photo_url?`<img class="card-img" src="${esc(o.photo_url)}" style="margin-bottom:12px" onerror="this.style.display='none'">` :'';
-  let ratHtml='';
-  if(DB_OK){
-    const{data:rats}=await sb.from('ratings').select('score').eq('to_nick',o.author_nick);
+  let o = allOrders.find(x => x.id === id);
+  if(!o){
+    const res = await fetch(WORKER_URL + '/api/orders/' + id);
+    o = await res.json();
+  }
+  if(!o) return;
+  
+  const cats = {hw:'📚 ДЗ', food:'🍕 Еда', notes:'📝 Конспект', task:'⚡ Поручение'};
+  const isMine = o.author_nick === P.nick;
+  const iAmTaker = myTaken.includes(id);
+  const priceStr = esc(o.amount) + ' ₽ 💵';
+  const img = o.photo_url ? `<img class="card-img" src="${esc(o.photo_url)}" style="margin-bottom:12px" onerror="this.style.display=\'none\'">` : '';
+  
+  let ratHtml = '';
+  try{
+    const res = await fetch(WORKER_URL + '/api/ratings?nick=' + encodeURIComponent(o.author_nick));
+    const rats = await res.json();
     if(rats?.length){
-      const avg=(rats.reduce((s,r)=>s+r.score,0)/rats.length).toFixed(1);
-      const r=Math.round(+avg);
-      ratHtml=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      const avg = (rats.reduce((s, r) => s + r.score, 0) / rats.length).toFixed(1);
+      const r = Math.round(+avg);
+      ratHtml = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
         <span style="font-family:var(--hud);font-size:18px;color:var(--yellow)">${avg}</span>
-        <span style="color:var(--yellow);letter-spacing:2px">${'★'.repeat(r)}${'☆'.repeat(5-r)}</span>
+        <span style="color:var(--yellow);letter-spacing:2px">${'★'.repeat(r)}${'☆'.repeat(5 - r)}</span>
         <span style="font-size:10px;color:var(--text2)">${rats.length} оценок</span>
       </div>`;
     }
+  } catch(e){}
+  
+  let payInfo = '';
+  if(o.status === 'taken' && (isMine || iAmTaker)){
+    payInfo = `<div style="background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.2);border-radius:7px;padding:11px;margin-bottom:12px;font-size:11px;color:var(--text2);line-height:1.8">💵 Оплата наличными — договоритесь в чате где и когда встретиться.</div>`;
   }
-  let payInfo='';
-  if(o.status==='taken'&&(isMine||iAmTaker)){
-    payInfo=`<div style="background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.2);border-radius:7px;padding:11px;margin-bottom:12px;font-size:11px;color:var(--text2);line-height:1.8">💵 Оплата наличными — договоритесь в чате где и когда встретиться.</div>`;
-  }
-  let btns='';
-  if(o.status==='open'&&!isMine)btns+=`<button class="btn btn-g btn-full" style="margin-bottom:8px" onclick="takeOrder('${id}')">⚡ ВЗЯТЬ В РАБОТУ</button>`;
-  if(isMine&&o.status==='taken')btns+=`<button class="btn btn-o btn-full btn-sm" style="margin-bottom:8px" onclick="confirmDone('${id}')">✅ ПОДТВЕРДИТЬ ВЫПОЛНЕНИЕ</button>`;
-  if(o.status==='done'&&(isMine||iAmTaker))btns+=`<button class="btn btn-sm btn-o" style="margin-bottom:8px" onclick="openRateModal('${id}')">⭐ Оценить</button> `;
-  if((isMine||iAmTaker)&&o.status==='taken')btns+=`<button class="btn btn-sm btn-o" style="margin-bottom:8px" onclick="openOrderChat('${id}')">💬 Чат</button> `;
-  if(!isMine)btns+=`<button class="btn btn-sm btn-r" style="margin-bottom:8px" onclick="openReport('${id}')">🚩</button>`;
-  if(isMine&&o.status==='open')btns+=`<button class="btn btn-r btn-full btn-sm" style="margin-bottom:8px" onclick="cancelOrder('${id}')">↩️ Отменить</button>`;
-  document.getElementById('detail-body').innerHTML=`
+  
+  let btns = '';
+  if(o.status === 'open' && !isMine) btns += `<button class="btn btn-g btn-full" style="margin-bottom:8px" onclick="takeOrder('${id}')">⚡ ВЗЯТЬ В РАБОТУ</button>`;
+  if(isMine && o.status === 'taken') btns += `<button class="btn btn-o btn-full btn-sm" style="margin-bottom:8px" onclick="confirmDone('${id}')">✅ ПОДТВЕРДИТЬ ВЫПОЛНЕНИЕ</button>`;
+  if(o.status === 'done' && (isMine || iAmTaker)) btns += `<button class="btn btn-sm btn-o" style="margin-bottom:8px" onclick="openRateModal('${id}')">⭐ Оценить</button> `;
+  if((isMine || iAmTaker) && o.status === 'taken') btns += `<button class="btn btn-sm btn-o" style="margin-bottom:8px" onclick="openOrderChat('${id}')">💬 Чат</button> `;
+  if(!isMine) btns += `<button class="btn btn-sm btn-r" style="margin-bottom:8px" onclick="openReport('${id}')">🚩</button>`;
+  if(isMine && o.status === 'open') btns += `<button class="btn btn-r btn-full btn-sm" style="margin-bottom:8px" onclick="cancelOrder('${id}')">↩️ Отменить</button>`;
+  
+  document.getElementById('detail-body').innerHTML = `
     <div class="modal-title">${esc(o.title)}</div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <span class="cat-tag cat-${esc(o.cat)}" style="padding:4px 10px;border-radius:4px;font-size:11px">${cats[o.cat]||o.cat}</span>
+      <span class="cat-tag cat-${esc(o.cat)}" style="padding:4px 10px;border-radius:4px;font-size:11px">${cats[o.cat] || o.cat}</span>
       <span style="font-family:var(--hud);font-size:20px;color:var(--green);font-weight:700">${priceStr}</span>
     </div>
     ${ratHtml}${img}
-    ${o.description?`<div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:12px">${esc(o.description)}</div>`:''}
-    ${o.deadline?`<div style="font-size:11px;color:var(--text2);margin-bottom:12px">⏰ ${new Date(o.deadline).toLocaleString('ru')}</div>`:''}
-    ${o.school_name?`<div style="font-size:11px;color:var(--cyan);margin-bottom:12px">🏫 ${esc(o.school_name)}</div>`:''}
+    ${o.description ? `<div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:12px">${esc(o.description)}</div>` : ''}
+    ${o.deadline ? `<div style="font-size:11px;color:var(--text2);margin-bottom:12px">⏰ ${new Date(o.deadline).toLocaleString('ru')}</div>` : ''}
+    ${o.school_name ? `<div style="font-size:11px;color:var(--cyan);margin-bottom:12px">🏫 ${esc(o.school_name)}</div>` : ''}
     <div style="font-size:11px;color:var(--text2);margin-bottom:14px">👤 ${esc(o.author_nick)} · ${timeAgo(o.created_at)}</div>
     ${payInfo}
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">${btns}</div>`;
+  
   openModal('modal-detail');
 }
 async function takeOrder(id){
-  if(!rl('take',10,3600000)){toast('⛔ Максимум 10 заказов в час');return;}
+  if(!rl('take', 10, 3600000)){ toast('⛔ Максимум 10 заказов в час'); return; }
   try{
-    await api('PUT',`/api/orders/${id}/take`,{nick:P.nick});
-    myTaken.push(id);saveLocal();
-    closeModal('modal-detail');loadFeed();
+    await api('PUT', `/api/orders/${id}/take`, { nick: P.nick });
+    myTaken.push(id);
+    saveLocal();
+    closeModal('modal-detail');
+    loadFeed();
     toast('✅ Заказ взят! Договорись с заказчиком в чате.');
-  }catch(e){toast('❌ '+e.message);}
+  } catch(e){
+    toast('❌ ' + e.message);
+  }
 }
 async function confirmDone(id){
-  if(!confirm('Подтвердить?'))return;
+  if(!confirm('Подтвердить?')) return;
   try{
-    await api('PUT',`/api/orders/${id}/done`,{nick:P.nick});
-    closeModal('modal-detail');loadFeed();
+    await api('PUT', `/api/orders/${id}/done`, { nick: P.nick });
+    closeModal('modal-detail');
+    loadFeed();
     toast('✅ Выполнено! Не забудьте рассчитаться наличными.');
-  }catch(e){toast('❌ '+e.message);}
+  } catch(e){
+    toast('❌ ' + e.message);
+  }
 }
 async function cancelOrder(id){
-  if(!confirm('Отменить заказ?'))return;
+  if(!confirm('Отменить заказ?')) return;
   try{
-    await api('DELETE',`/api/orders/${id}`,{nick:P.nick});
-    closeModal('modal-detail');loadFeed();
+    await api('DELETE', `/api/orders/${id}`, { nick: P.nick });
+    closeModal('modal-detail');
+    loadFeed();
     toast('↩️ Отменено');
-  }catch(e){toast('❌ '+e.message);}
+  } catch(e){
+    toast('❌ ' + e.message);
+  }
 }
-
 async function loadMy(){
-  const list=document.getElementById('my-list');
-  list.innerHTML=`<div class="loader"><div class="spin">⟳</div></div>`;
-  if(!DB_OK){list.innerHTML=`<div class="empty"><div class="empty-icon">⚙️</div><div class="empty-text">Настрой базу данных</div></div>`;return;}
+  const list = document.getElementById('my-list');
+  list.innerHTML = `<div class="loader"><div class="spin">⟳</div></div>`;
+  
   try{
-    let orders=[];
-    if(myTab==='posted'){
-      const{data}=await sb.from('orders').select('*').eq('author_nick',P.nick).order('created_at',{ascending:false});
-      orders=data||[];
-    }else{
-      if(!myTaken.length)orders=[];
-      else{const{data}=await sb.from('orders').select('*').in('id',myTaken).order('created_at',{ascending:false});orders=data||[];}
-    }
-    list.innerHTML=orders.length?orders.map(orderCard).join('')
-      :`<div class="empty"><div class="empty-icon">${myTab==='posted'?'📭':'🔍'}</div>
-         <div class="empty-text">${myTab==='posted'?'Ты ещё не создавал заказов':'Ты ещё не брал заказов'}</div></div>`;
-  }catch(e){list.innerHTML=`<div class="empty"><div class="empty-icon">❌</div><div class="empty-text">${esc(e.message)}</div></div>`;}
+    let url = WORKER_URL + '/api/my?nick=' + encodeURIComponent(P.nick) + '&type=' + myTab;
+    const res = await fetch(url);
+    const data = await res.json();
+    
+    list.innerHTML = data.length ? data.map(orderCard).join('')
+      : `<div class="empty"><div class="empty-icon">${myTab === 'posted' ? '📭' : '🔍'}</div>
+         <div class="empty-text">${myTab === 'posted' ? 'Ты ещё не создавал заказов' : 'Ты ещё не брал заказов'}</div></div>`;
+  } catch(e){
+    list.innerHTML = `<div class="empty"><div class="empty-icon">❌</div><div class="empty-text">${esc(e.message)}</div></div>`;
+  }
 }
 function switchTab(tab){
-  myTab=tab;
-  document.getElementById('tab-p').className=tab==='posted'?'btn btn-sm btn-g':'btn btn-sm btn-o';
-  document.getElementById('tab-t').className=tab==='taken'?'btn btn-sm btn-g':'btn btn-sm btn-o';
+  myTab = tab;
+  document.getElementById('tab-p').className = tab === 'posted' ? 'btn btn-sm btn-g' : 'btn btn-sm btn-o';
+  document.getElementById('tab-t').className = tab === 'taken' ? 'btn btn-sm btn-g' : 'btn btn-sm btn-o';
   loadMy();
 }
-
 function renderPost(){
-  document.getElementById('post-form').style.display='block';
+  document.getElementById('post-form').style.display = 'block';
 }
 async function submitOrder(){
-  const title=document.getElementById('p-title').value.trim();
-  const desc=document.getElementById('p-desc').value.trim();
-  const amount=+document.getElementById('p-amount').value;
-  const cur=document.getElementById('p-cur').value;
-  const cat=document.getElementById('p-cat').value;
-  const dl=document.getElementById('p-deadline').value;
-  const photo=document.getElementById('p-photo').files[0];
-  if(!title){toast('⚠️ Введи заголовок');return;}
-  if(!amount||amount<=0){toast('⚠️ Введи сумму');return;}
-  if(!document.getElementById('agree-check').checked){toast('⚠️ Прими соглашение');openModal('modal-agreement');return;}
-
-  if(!rl('post',5,3600000)){toast('⛔ Максимум 5 заказов в час');return;}
-  const btn=document.getElementById('post-btn');
-  btn.disabled=true;btn.textContent='публикуем...';
-  let photo_url='';
-  if(photo)photo_url=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(photo);});
+  const title = document.getElementById('p-title').value.trim();
+  const desc = document.getElementById('p-desc').value.trim();
+  const amount = +document.getElementById('p-amount').value;
+  const cur = document.getElementById('p-cur').value;
+  const cat = document.getElementById('p-cat').value;
+  const dl = document.getElementById('p-deadline').value;
+  const photo = document.getElementById('p-photo').files[0];
+  
+  if(!title){ toast('⚠️ Введи заголовок'); return; }
+  if(!amount || amount <= 0){ toast('⚠️ Введи сумму'); return; }
+  if(!document.getElementById('agree-check').checked){
+    toast('⚠️ Прими соглашение');
+    openModal('modal-agreement');
+    return;
+  }
+  if(!rl('post', 5, 3600000)){ toast('⛔ Максимум 5 заказов в час'); return; }
+  
+  const btn = document.getElementById('post-btn');
+  btn.disabled = true;
+  btn.textContent = 'публикуем...';
+  
+  let photo_url = '';
+  if(photo){
+    photo_url = await new Promise(res => {
+      const r = new FileReader();
+      r.onload = e => res(e.target.result);
+      r.readAsDataURL(photo);
+    });
+  }
+  
   try{
-    await api('POST','/api/orders',{cat,title,description:desc,amount,currency:cur,deadline:dl||null,photo_url,nick:P.nick,schoolId:P.schoolId});
-
-    ['p-title','p-desc','p-amount','p-deadline'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('p-photo').value='';
-    document.getElementById('agree-check').checked=false;
+    await api('POST', '/api/orders', {
+      cat, title, description: desc, amount,
+      currency: cur, deadline: dl || null,
+      photo_url, nick: P.nick, schoolId: P.schoolId
+    });
+    
+    ['p-title','p-desc','p-amount','p-deadline'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('p-photo').value = '';
+    document.getElementById('agree-check').checked = false;
     showScreen('feed');
     toast('✅ Заказ опубликован! Договоритесь в чате.');
-  }catch(e){toast('❌ '+e.message);}
-  btn.disabled=false;btn.textContent='⚡ ОПУБЛИКОВАТЬ ЗАКАЗ';
+  } catch(e){
+    toast('❌ ' + e.message);
+  }
+  
+  btn.disabled = false;
+  btn.textContent = '⚡ ОПУБЛИКОВАТЬ ЗАКАЗ';
 }
-
 async function openOrderChat(orderId){
-  orderChatId=orderId;
-  const o=allOrders.find(x=>x.id===orderId);
-  document.getElementById('order-chat-title').textContent='💬 '+(o?.title||'').slice(0,30);
+  orderChatId = orderId;
+  const o = allOrders.find(x => x.id === orderId);
+  document.getElementById('order-chat-title').textContent = '💬 ' + (o?.title || '').slice(0, 30);
   await loadOrderMessages();
   openModal('modal-order-chat');
 }
 async function loadOrderMessages(){
-  if(!DB_OK)return;
-  const{data}=await sb.from('messages').select('*').eq('order_id',orderChatId).order('created_at',{ascending:true});
-  const box=document.getElementById('order-chat-box');
-  if(!data?.length){box.innerHTML='<div style="text-align:center;color:var(--text2);font-size:11px;padding:20px">Сообщений пока нет</div>';return;}
-  box.innerHTML=data.map(m=>`
-    <div class="cmsg ${m.nick===P.nick?'mine':'theirs'}">
-      ${m.nick!==P.nick?`<div class="cnick">${esc(m.nick)}</div>`:''}
+  const res = await fetch(WORKER_URL + '/api/messages/' + orderChatId);
+  const data = await res.json();
+  const box = document.getElementById('order-chat-box');
+  
+  if(!data?.length){
+    box.innerHTML = '<div style="text-align:center;color:var(--text2);font-size:11px;padding:20px">Сообщений пока нет</div>';
+    return;
+  }
+  
+  box.innerHTML = data.map(m => `
+    <div class="cmsg ${m.nick === P.nick ? 'mine' : 'theirs'}">
+      ${m.nick !== P.nick ? `<div class="cnick">${esc(m.nick)}</div>` : ''}
       <div class="cbubble">${esc(m.message)}</div>
       <div class="cmeta">${timeAgo(m.created_at)}</div>
-    </div>`).join('');
-  box.scrollTop=box.scrollHeight;
+    </div>
+  `).join('');
+  
+  box.scrollTop = box.scrollHeight;
 }
 async function sendOrderMsg(){
-  const msg=document.getElementById('order-chat-inp').value.trim();
-  if(!msg||!orderChatId)return;
-  if(!rl('chat',30,60000)){toast('⛔ Слишком быстро');return;}
+  const msg = document.getElementById('order-chat-inp').value.trim();
+  if(!msg || !orderChatId) return;
+  if(!rl('chat', 30, 60000)){ toast('⛔ Слишком быстро'); return; }
+  
   try{
-    await api('POST','/api/chat',{order_id:orderChatId,nick:P.nick,message:msg});
-    document.getElementById('order-chat-inp').value='';
+    await api('POST', '/api/chat', {
+      order_id: orderChatId,
+      nick: P.nick,
+      message: msg
+    });
+    document.getElementById('order-chat-inp').value = '';
     await loadOrderMessages();
-  }catch(e){toast('❌ '+e.message);}
+  } catch(e){
+    toast('❌ ' + e.message);
+  }
 }
-
 function openRateModal(orderId){
-  rateOrderId=orderId;selectedStar=0;
-  document.querySelectorAll('.star').forEach(s=>s.classList.remove('lit'));
-  document.getElementById('star-label').textContent='выбери оценку';
-  document.getElementById('rate-comment').value='';
+  rateOrderId = orderId;
+  selectedStar = 0;
+  document.querySelectorAll('.star').forEach(s => s.classList.remove('lit'));
+  document.getElementById('star-label').textContent = 'выбери оценку';
+  document.getElementById('rate-comment').value = '';
   openModal('modal-rate');
 }
 function setStar(v){
-  selectedStar=v;
-  const labels=['','Плохо','Не очень','Нормально','Хорошо','Отлично!'];
-  document.getElementById('star-label').textContent=labels[v];
-  document.querySelectorAll('.star').forEach(s=>s.classList.toggle('lit',+s.dataset.v<=v));
+  selectedStar = v;
+  const labels = ['', 'Плохо', 'Не очень', 'Нормально', 'Хорошо', 'Отлично!'];
+  document.getElementById('star-label').textContent = labels[v];
+  document.querySelectorAll('.star').forEach(s => s.classList.toggle('lit', +s.dataset.v <= v));
 }
 async function submitRating(){
-  if(!selectedStar){toast('⚠️ Выбери оценку');return;}
-  const o=allOrders.find(x=>x.id===rateOrderId);if(!o)return;
-  const toNick=myTaken.includes(rateOrderId)?o.taker_nick:o.author_nick;
+  if(!selectedStar){ toast('⚠️ Выбери оценку'); return; }
+  const o = allOrders.find(x => x.id === rateOrderId);
+  if(!o) return;
+  const toNick = myTaken.includes(rateOrderId) ? o.taker_nick : o.author_nick;
+  
   try{
-    await api('POST','/api/rate',{order_id:rateOrderId,from_nick:P.nick,to_nick:toNick,score:selectedStar,comment:document.getElementById('rate-comment').value.trim()});
-    closeModal('modal-rate');toast('⭐ Оценка отправлена!');
-  }catch(e){toast('❌ '+e.message);}
+    await api('POST', '/api/rate', {
+      order_id: rateOrderId,
+      from_nick: P.nick,
+      to_nick: toNick,
+      score: selectedStar,
+      comment: document.getElementById('rate-comment').value.trim()
+    });
+    closeModal('modal-rate');
+    toast('⭐ Оценка отправлена!');
+  } catch(e){
+    toast('❌ ' + e.message);
+  }
 }
-
-function openReport(orderId){reportOrderId=orderId;document.getElementById('report-reason').value='';openModal('modal-report');}
+function openReport(orderId){
+  reportOrderId = orderId;
+  document.getElementById('report-reason').value = '';
+  openModal('modal-report');
+}
 async function submitReport(){
-  const reason=document.getElementById('report-reason').value.trim();
-  if(!reason){toast('⚠️ Введи причину');return;}
-  try{await api('POST','/api/report',{order_id:reportOrderId,reporter_nick:P.nick,reason});closeModal('modal-report');toast('🚩 Жалоба отправлена');}
-  catch(e){toast('❌ '+e.message);}
+  const reason = document.getElementById('report-reason').value.trim();
+  if(!reason){ toast('⚠️ Введи причину'); return; }
+  try{
+    await api('POST', '/api/report', {
+      order_id: reportOrderId,
+      reporter_nick: P.nick,
+      reason
+    });
+    closeModal('modal-report');
+    toast('🚩 Жалоба отправлена');
+  } catch(e){
+    toast('❌ ' + e.message);
+  }
 }
 
-// ── ПОСТЫ И КОММЕНТАРИИ ─────────────────────────────────────
-
+// ========== ПОСТЫ И КОММЕНТАРИИ ==========
 function openCreatePost(){
   document.getElementById('post-content').value = '';
   document.getElementById('post-media').value = '';
   openModal('modal-create-post');
 }
-
 async function createPost(){
   const content = document.getElementById('post-content').value.trim();
   const mediaFile = document.getElementById('post-media').files[0];
   
-  if(!content){toast('⚠️ Введи текст поста');return;}
-  if(!rl('post',10,3600000)){toast('⛔ Слишком много постов');return;}
-
+  if(!content){ toast('⚠️ Введи текст поста'); return; }
+  if(!rl('post', 10, 3600000)){ toast('⛔ Слишком много постов'); return; }
+  
   let media_url = '';
   if(mediaFile){
-    media_url = await new Promise(res=>{
-      const r=new FileReader();
-      r.onload=e=>res(e.target.result);
+    media_url = await new Promise(res => {
+      const r = new FileReader();
+      r.onload = e => res(e.target.result);
       r.readAsDataURL(mediaFile);
     });
   }
-
+  
   try{
-    await api('POST','/api/posts',{
+    await api('POST', '/api/posts', {
       nick: P.nick,
       content,
       media_url,
@@ -1025,9 +1141,10 @@ async function createPost(){
     toast('✅ Пост опубликован!');
     loadPosts(true);
     loadProfilePosts();
-  }catch(e){toast('❌ '+e.message);}
+  } catch(e){
+    toast('❌ ' + e.message);
+  }
 }
-
 async function loadPosts(reset = true){
   if(reset){
     currentPostPage = 1;
@@ -1036,8 +1153,6 @@ async function loadPosts(reset = true){
   
   const list = document.getElementById('posts-list');
   if(reset) list.innerHTML = `<div class="loader"><div class="spin">⟳</div><div>загрузка...</div></div>`;
-
-  if(!DB_OK) return;
   
   try{
     const url = `${WORKER_URL}/api/feed/posts?school_id=${P.schoolId}&nick=${encodeURIComponent(P.nick)}&page=${currentPostPage}`;
@@ -1068,12 +1183,10 @@ async function loadPosts(reset = true){
     list.innerHTML = `<div class="empty"><div class="empty-icon">❌</div><div class="empty-text">Ошибка загрузки постов</div></div>`;
   }
 }
-
 function renderPostsList(){
   const list = document.getElementById('posts-list');
   list.innerHTML = currentPosts.map(post => postCard(post)).join('');
 }
-
 function postCard(p){
   const liked = p.liked_by_user || false;
   const mediaHtml = p.media_url ? `<img class="card-img" src="${esc(p.media_url)}" style="margin-bottom:10px;max-height:250px;object-fit:cover;" onerror="this.style.display='none'">` : '';
@@ -1095,17 +1208,12 @@ function postCard(p){
     </div>
   `;
 }
-
 async function likePost(postId, like){
   try{
     const res = await fetch(WORKER_URL + '/api/posts/like', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        post_id: postId,
-        nick: P.nick,
-        like: like
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ post_id: postId, nick: P.nick, like })
     });
     
     const data = await res.json();
@@ -1124,7 +1232,6 @@ async function likePost(postId, like){
     toast('❌ ' + e.message);
   }
 }
-
 async function openPostModal(postId){
   const post = currentPosts.find(p => p.id === postId);
   if(!post) return;
@@ -1184,7 +1291,6 @@ async function openPostModal(postId){
   `;
   openModal('modal-view-post');
 }
-
 async function addComment(postId){
   const input = document.getElementById(`comment-input-${postId}`);
   const content = input.value.trim();
@@ -1193,12 +1299,8 @@ async function addComment(postId){
   try{
     const res = await fetch(WORKER_URL + '/api/comments', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        post_id: postId,
-        nick: P.nick,
-        content: content
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ post_id: postId, nick: P.nick, content })
     });
     
     const data = await res.json();
@@ -1216,7 +1318,6 @@ async function addComment(postId){
     toast('❌ ' + e.message);
   }
 }
-
 async function deletePost(postId){
   if(!confirm('Удалить пост?')) return;
   try{
@@ -1229,17 +1330,13 @@ async function deletePost(postId){
     toast('❌ ' + e.message);
   }
 }
-
 async function loadProfilePosts(){
   const list = document.getElementById('profile-posts-list');
   list.innerHTML = `<div class="loader"><div class="spin">⟳</div></div>`;
   
   try{
-    const {data} = await sb.from('posts')
-      .select('*')
-      .eq('author_nick', P.nick)
-      .order('created_at', {ascending: false})
-      .limit(5);
+    const res = await fetch(WORKER_URL + '/api/user/posts?nick=' + encodeURIComponent(P.nick) + '&limit=5');
+    const data = await res.json();
     
     if(!data?.length){
       list.innerHTML = `<div class="empty-text" style="padding:12px;font-size:11px;">У тебя пока нет постов</div>`;
@@ -1248,7 +1345,7 @@ async function loadProfilePosts(){
     
     list.innerHTML = data.map(p => `
       <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer;" onclick="openPostModal('${p.id}')">
-        <div style="font-size:12px;">${esc(p.content).slice(0,80)}${p.content.length>80?'...':''}</div>
+        <div style="font-size:12px;">${esc(p.content).slice(0,80)}${p.content.length > 80 ? '...' : ''}</div>
         <div style="display:flex;gap:12px;margin-top:6px;font-size:10px;color:var(--text2);">
           <span>❤️ ${p.likes_count || 0}</span>
           <span>💬 ${p.comments_count || 0}</span>
@@ -1261,53 +1358,88 @@ async function loadProfilePosts(){
   }
 }
 
-// ── PROFILE ─────────────────────────────────────
+// ========== PROFILE ==========
 async function loadProfile(){
   renderProfile();
   loadProfilePosts();
-  if(!DB_OK)return;
+  
   try{
-    const{data:rats}=await sb.from('ratings').select('score').eq('to_nick',P.nick);
+    const res = await fetch(WORKER_URL + '/api/ratings?nick=' + encodeURIComponent(P.nick));
+    const rats = await res.json();
+    
     if(rats?.length){
-      const avg=(rats.reduce((s,r)=>s+r.score,0)/rats.length).toFixed(1);
-      const r=Math.round(+avg);
-      document.getElementById('prof-stars-d').textContent='★'.repeat(r)+'☆'.repeat(5-r);
-      document.getElementById('prof-rcount-d').textContent=rats.length+' оценок · '+avg+' из 5';
-      document.getElementById('prof-rating-block').style.display='block';
+      const avg = (rats.reduce((s, r) => s + r.score, 0) / rats.length).toFixed(1);
+      const r = Math.round(+avg);
+      document.getElementById('prof-stars-d').textContent = '★'.repeat(r) + '☆'.repeat(5 - r);
+      document.getElementById('prof-rcount-d').textContent = rats.length + ' оценок · ' + avg + ' из 5';
+      document.getElementById('prof-rating-block').style.display = 'block';
     }
-  }catch(e){}
+  } catch(e){}
 }
 function renderProfile(){
-  document.getElementById('prof-av').textContent=P.nick?P.nick[0].toUpperCase():'?';
-  document.getElementById('prof-nick-d').textContent=P.nick||'аноним';
-  document.getElementById('prof-school-d').textContent='🏫 '+(P.school||'—');
-  document.getElementById('hdr-nick').textContent=P.nick||'аноним';
+  document.getElementById('prof-av').textContent = P.nick ? P.nick[0].toUpperCase() : '?';
+  document.getElementById('prof-nick-d').textContent = P.nick || 'аноним';
+  document.getElementById('prof-school-d').textContent = '🏫 ' + (P.school || '—');
+  document.getElementById('hdr-nick').textContent = P.nick || 'аноним';
 }
-
 async function changePassword(){
-  const oldPass=document.getElementById('prof-old-pass').value;
-  const newPass=document.getElementById('prof-new-pass').value;
-  if(!oldPass){toast('⚠️ Введи текущий пароль');return;}
-  if(!newPass||newPass.length<6){toast('⚠️ Новый пароль минимум 6 символов');return;}
+  const oldPass = document.getElementById('prof-old-pass').value;
+  const newPass = document.getElementById('prof-new-pass').value;
+  
+  if(!oldPass){ toast('⚠️ Введи текущий пароль'); return; }
+  if(!newPass || newPass.length < 6){ toast('⚠️ Новый пароль минимум 6 символов'); return; }
+  
   try{
-    const oldHash=await hashPassword(oldPass);
-    const newHash=await hashPassword(newPass);
-    await api('POST','/api/auth/update',{nick:P.nick,passHash:oldHash,newPassHash:newHash});
-    document.getElementById('prof-old-pass').value='';
-    document.getElementById('prof-new-pass').value='';
+    const oldHash = await hashPassword(oldPass);
+    const newHash = await hashPassword(newPass);
+    await api('POST', '/api/auth/update', {
+      nick: P.nick,
+      passHash: oldHash,
+      newPassHash: newHash
+    });
+    document.getElementById('prof-old-pass').value = '';
+    document.getElementById('prof-new-pass').value = '';
     toast('✅ Пароль изменён!');
-  }catch(e){toast('❌ '+e.message);}
+  } catch(e){
+    toast('❌ ' + e.message);
+  }
 }
 
-function copyText(txt){navigator.clipboard.writeText(txt).then(()=>toast('📋 Скопировано'));}
-function openModal(id){document.getElementById(id).classList.add('open');}
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-document.querySelectorAll('.modal-bg').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('open');}));
+// ========== UTILS ==========
+function copyText(txt){
+  navigator.clipboard.writeText(txt).then(() => toast('📋 Скопировано'));
+}
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-bg').forEach(bg => {
+  bg.addEventListener('click', e => {
+    if(e.target === bg) bg.classList.remove('open');
+  });
+});
 let toastT;
-function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2800);}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function timeAgo(ts){const d=Date.now()-new Date(ts).getTime();if(d<60000)return 'только что';if(d<3600000)return Math.floor(d/60000)+'м назад';if(d<86400000)return Math.floor(d/3600000)+'ч назад';return Math.floor(d/86400000)+'д назад';}
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => el.classList.remove('show'), 2800);
+}
+function esc(s){
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function timeAgo(ts){
+  const d = Date.now() - new Date(ts).getTime();
+  if(d < 60000) return 'только что';
+  if(d < 3600000) return Math.floor(d / 60000) + 'м назад';
+  if(d < 86400000) return Math.floor(d / 3600000) + 'ч назад';
+  return Math.floor(d / 86400000) + 'д назад';
+}
 
+// ========== INFINITE SCROLL ==========
 window.addEventListener('scroll', () => {
   if(hasMorePosts && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500){
     currentPostPage++;
@@ -1315,8 +1447,9 @@ window.addEventListener('scroll', () => {
   }
 });
 
+// ========== INIT ==========
 loadLocal();
-if(P.nick)enterApp();
+if(P.nick) enterApp();
 </script>
 </body>
 </html>
